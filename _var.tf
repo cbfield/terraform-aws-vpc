@@ -59,6 +59,16 @@ variable "instance_tenancy" {
   default     = "default"
 }
 
+variable "internet_gateway" {
+  description = "Configurations for the internet gateway used by this VPC"
+  type = object({
+    tags = optional(map(string))
+  })
+  default = {
+    tags = null
+  }
+}
+
 variable "name" {
   description = "The name of the VPC, and the prefix for resources created within the VPC"
   type        = string

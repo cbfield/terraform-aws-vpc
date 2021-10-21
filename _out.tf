@@ -43,6 +43,11 @@ output "instance_tenancy" {
   value       = var.instance_tenancy
 }
 
+output "internet_gateway" {
+  description = "The internet gateway created for this VPC"
+  value       = aws_internet_gateway.igw
+}
+
 output "name" {
   description = "The value provided for var.name"
   value       = var.name
