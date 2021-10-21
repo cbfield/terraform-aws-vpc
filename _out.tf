@@ -28,6 +28,16 @@ output "enable_dns_support" {
   value       = var.enable_dns_support
 }
 
+output "dhcp" {
+  description = "The value provided for var.dhcp"
+  value       = var.dhcp
+}
+
+output "dhcp_options" {
+  description = "The DHCP options configured for the VPC"
+  value       = aws_vpc_dhcp_options.dhcp_options
+}
+
 output "instance_tenancy" {
   description = "The provided value for var.instance_tenancy"
   value       = var.instance_tenancy
@@ -43,4 +53,9 @@ output "tags" {
   value = merge(var.tags, {
     "Managed By Terraform" = "true"
   })
+}
+
+output "vpc" {
+  description = "The VPC resource object"
+  value       = aws_vpc.vpc
 }

@@ -9,6 +9,26 @@ variable "cidr_block" {
   type        = string
 }
 
+variable "dhcp" {
+  description = "Configurations for DHCP options for this VPC"
+  type = object({
+    domain_name          = optional(string)
+    domain_name_servers  = optional(list(string))
+    ntp_servers          = optional(list(string))
+    netbios_name_servers = optional(list(string))
+    netbios_node_type    = optional(number)
+    tags                 = optional(map(string))
+  })
+  default = {
+    domain_name          = null
+    domain_name_servers  = null
+    ntp_servers          = null
+    netbios_name_servers = null
+    netbios_node_type    = null
+    tags                 = null
+  }
+}
+
 variable "enable_classiclink" {
   description = "Whether or not to enable ClassicLink for the VPC"
   type        = bool
