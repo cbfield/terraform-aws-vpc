@@ -6,10 +6,10 @@ module "my_vpc" {
 
   subnet_groups = [
     {
-      type    = "private"
-      name    = "private-default"
-      prefix  = "10.0.0.0/16"
-      newbits = 4
+      type         = "private"
+      name         = "private-default"
+      newbits      = 8
+      first_netnum = 1
       availability_zones = [
         "us-east-1a",
         "us-east-1b",

@@ -6,9 +6,9 @@ resource "aws_subnet" "subnet" {
           {
             assign_ipv6_address_on_creation = group.assign_ipv6_address_on_creation
             availability_zone               = az
-            cidr_block                      = cidrsubnet(group.prefix, group.newbits, index(sort(group.availability_zones), az))
+            cidr_block                      = cidrsubnet(var.cidr_block, group.newbits, group.first_netnum + index(sort(group.availability_zones), az))
             customer_owned_ipv4_pool        = group.customer_owned_ipv4_pool
-            ipv6_cidr_block                 = group.ipv6_prefix == null || group.ipv6_newbits == null ? null : cidrsubnet(group.ipv6_prefix, group.ipv6_newbits, index(sort(group.availability_zones), az))
+            ipv6_cidr_block                 = var.assign_generated_ipv6_cidr_block == null || group.ipv6_prefix == null || group.ipv6_newbits == null ? null : cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, group.ipv6_newbits, group.ipv6_first_netnum + index(sort(group.availability_zones), az))
             map_customer_owned_ip_on_launch = group.map_customer_owned_ip_on_launch
             map_public_ip_on_launch         = group.map_public_ip_on_launch
             outpost_arn                     = group.outpost_arn

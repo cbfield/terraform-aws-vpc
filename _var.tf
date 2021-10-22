@@ -80,6 +80,8 @@ variable "subnet_groups" {
     assign_ipv6_address_on_creation = optional(bool)
     availability_zones              = list(string)
     customer_owned_ipv4_pool        = optional(string)
+    first_netnum                    = number
+    ipv6_first_netnum               = optional(number)
     ipv6_newbits                    = optional(number)
     ipv6_prefix                     = optional(string)
     map_customer_owned_ip_on_launch = optional(bool)
@@ -106,7 +108,6 @@ variable "subnet_groups" {
     name             = string
     newbits          = number
     outpost_arn      = optional(string)
-    prefix           = string
     route_table_tags = optional(map(string))
     routes = optional(list(object({
       carrier_gateway_id          = optional(string)
