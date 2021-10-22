@@ -6,9 +6,9 @@ resource "aws_subnet" "subnet" {
           {
             assign_ipv6_address_on_creation = group.assign_ipv6_address_on_creation
             availability_zone               = az
-            cidr_block                      = cidrsubnet(group.prefix, group.newbits, index(group.availability_zones, az))
+            cidr_block                      = cidrsubnet(group.prefix, group.newbits, index(sort(group.availability_zones), az))
             customer_owned_ipv4_pool        = group.customer_owned_ipv4_pool
-            ipv6_cidr_block                 = group.ipv6_prefix == null || group.ipv6_newbits == null ? null : cidrsubnet(group.ipv6_prefix, group.ipv6_newbits, index(group.availability_zones, az))
+            ipv6_cidr_block                 = group.ipv6_prefix == null || group.ipv6_newbits == null ? null : cidrsubnet(group.ipv6_prefix, group.ipv6_newbits, index(sort(group.availability_zones), az))
             map_customer_owned_ip_on_launch = group.map_customer_owned_ip_on_launch
             map_public_ip_on_launch         = group.map_public_ip_on_launch
             outpost_arn                     = group.outpost_arn
@@ -37,4 +37,23 @@ resource "aws_subnet" "subnet" {
     "Name"                 = each.value.name
     "Type"                 = each.value.type
   })
+}
+
+resource "aws_subnet" "ngw_subnet" {
+  for_each = {
+    for az in toset(local.availability_zones) : az => {
+      availability_zone = az
+      cidr_block        = cidrsubnet(var.cidr_block, local.min_newbits, index(local.availability_zones, az))
+      name              = "${var.name}-nat-gateway-${az}"
+  } }
+
+  availability_zone = each.value.availability_zone
+  cidr_block        = each.value.cidr_block
+  vpc_id            = aws_vpc.vpc.id
+
+  tags = {
+    "Managed By Terraform" = "true"
+    "Name"                 = each.value.name
+    "Type"                 = "public"
+  }
 }
