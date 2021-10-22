@@ -36,10 +36,12 @@ resource "aws_subnet" "subnet" {
             group_name                      = group.name
             name                            = "${group.name}-${az}"
             tags                            = group.tags
+            type                            = group.type
           }
         ]
       ]
-  ]) : subnet.name => subnet }
+    ]) : subnet.name => subnet
+  }
 
   assign_ipv6_address_on_creation = each.value.assign_ipv6_address_on_creation
   availability_zone               = each.value.availability_zone
@@ -53,5 +55,32 @@ resource "aws_subnet" "subnet" {
 
   tags = merge(each.value.tags, {
     "Managed By Terraform" = "true"
+    "Name"                 = each.value.name
+    "Type"                 = each.value.type
+  })
+}
+
+resource "aws_route_table" "route_table" {
+  for_each = {
+    for table in flatten([
+      for group in var.subnet_groups : [
+        group.type == "public" || group.type == "persistence" ? [{
+          name = group.name
+          tags = group.tags
+          type = group.type
+          }] : [for az in group.availability_zones : {
+          name = "${group.name}-${az}"
+          tags = group.tags
+          type = group.type
+        }]
+      ]
+    ]) : table.name => table
+  }
+
+  vpc_id = aws_vpc.vpc.id
+  tags = merge(each.value.tags, {
+    "Managed By Terraform" = "true"
+    "Name"                 = each.value.name
+    "Type"                 = each.value.type
   })
 }
