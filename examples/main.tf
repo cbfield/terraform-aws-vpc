@@ -17,8 +17,8 @@ module "my_vpc" {
       ]
       routes = [
         {
-          cidr_block         = "10.20.0.0/16"
-          transit_gateway_id = "tgw-123123"
+          destination_cidr_block = "10.20.0.0/16"
+          transit_gateway_id     = "tgw-123123"
         },
       ]
       nacl = {
