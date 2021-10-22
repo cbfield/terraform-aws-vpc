@@ -3,7 +3,7 @@ resource "aws_route_table" "route_table" {
     for table in flatten([
       for group in var.subnet_groups : [
         group.type == "public" || group.type == "persistence" ? [{
-          name = group.name
+          name = "${var.name}-${group.name}"
           tags = group.tags
           type = group.type
           }] : [
@@ -22,6 +22,22 @@ resource "aws_route_table" "route_table" {
     "Name"                 = each.value.name
     "Type"                 = each.value.type
   })
+}
+
+resource "aws_route" "ngw_route" {
+  for_each = {
+    for table in flatten([
+      for group in var.subnet_groups : [
+        for az in group.availability_zones : {
+          nat_gateway_id = aws_nat_gateway.ngw[az].id
+          route_table    = "${var.name}-${group.name}-${az}"
+      }] if group.type == "private"
+    ]) : table.route_table => table
+  }
+
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = each.value.nat_gateway_id
+  route_table_id         = aws_route_table.route_table[each.value.route_table].id
 }
 
 resource "aws_route" "route" {
@@ -77,7 +93,7 @@ resource "aws_route" "route" {
   local_gateway_id            = each.value.local_gateway_id
   nat_gateway_id              = each.value.nat_gateway_id
   network_interface_id        = each.value.network_interface_id
-  route_table_id              = each.value.route_table
+  route_table_id              = aws_route_table.route_table[each.value.route_table].id
   transit_gateway_id          = each.value.transit_gateway_id
   vpc_endpoint_id             = each.value.vpc_endpoint_id
   vpc_peering_connection_id   = each.value.vpc_peering_connection_id
