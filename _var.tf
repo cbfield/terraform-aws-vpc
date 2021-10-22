@@ -74,6 +74,61 @@ variable "name" {
   type        = string
 }
 
+variable "subnet_groups" {
+  description = "Configurations for groups of subnets. TODO better description"
+  type = list(object({
+    assign_ipv6_address_on_creation = optional(bool)
+    availability_zones              = list(string)
+    customer_owned_ipv4_pool        = optional(string)
+    ipv6_newbits                    = optional(number)
+    ipv6_prefix                     = optional(string)
+    map_customer_owned_ip_on_launch = optional(bool)
+    map_public_ip_on_launch         = optional(bool)
+    nacl = optional(object({
+      ingress = optional(list(object({
+        cidr_block  = string
+        from_port   = number
+        protocol    = string
+        rule_action = string
+        rule_number = number
+        to_port     = number
+      })))
+      egress = optional(list(object({
+        cidr_block  = string
+        from_port   = number
+        protocol    = string
+        rule_action = string
+        rule_number = number
+        to_port     = number
+      })))
+      tags = optional(map(string))
+    }))
+    name             = string
+    newbits          = number
+    outpost_arn      = optional(string)
+    prefix           = string
+    route_table_tags = optional(map(string))
+    routes = optional(list(object({
+      carrier_gateway_id        = optional(string)
+      cidr_block                = optional(string)
+      egress_only_gateway_id    = optional(string)
+      gateway_id                = optional(string)
+      instance_id               = optional(string)
+      ipv6_cidr_block           = optional(string)
+      local_gateway_id          = optional(string)
+      nat_gateway_id            = optional(string)
+      network_interface_id      = optional(string)
+      prefix_list_id            = optional(string)
+      transit_gateway_id        = optional(string)
+      vpc_endpoint_id           = optional(string)
+      vpc_peering_connection_id = optional(string)
+    })))
+    tags = optional(map(string))
+    type = string
+  }))
+  default = []
+}
+
 variable "tags" {
   description = "Tags to assign to the VPC"
   type        = map(string)

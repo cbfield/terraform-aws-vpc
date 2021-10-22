@@ -53,6 +53,11 @@ output "name" {
   value       = var.name
 }
 
+output "subnet_groups" {
+  description = "The provided value for var.subnet_groups"
+  value       = var.subnet_groups
+}
+
 output "tags" {
   description = "Tags assigned to the VPC"
   value = merge(var.tags, {
