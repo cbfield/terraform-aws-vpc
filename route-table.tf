@@ -42,7 +42,7 @@ resource "aws_route_table_association" "ngw_igw_association" {
   gateway_id     = aws_internet_gateway.igw.id
 }
 
-resource "aws_route_table_association" "igw_association" {
+resource "aws_route_table_association" "public_igw_association" {
   for_each = { for group in var.subnet_groups : group.name => group if group.type == "public" }
 
   route_table_id = aws_route_table.route_table[each.key].id

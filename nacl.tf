@@ -106,7 +106,7 @@ resource "aws_network_acl_rule" "private_ingress" {
   to_port        = 0
 }
 
-resource "aws_network_acl_rule" "egress" {
+resource "aws_network_acl_rule" "public_private_egress" {
   for_each = { for group in var.subnet_groups : group.name => group if group.type == "public" || group.type == "private" }
 
   cidr_block     = "0.0.0.0/0"
