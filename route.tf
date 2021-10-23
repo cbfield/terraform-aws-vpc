@@ -3,14 +3,14 @@ resource "aws_route" "ngw_route" {
     for table in flatten([
       for group in var.subnet_groups : [
         for az in var.availability_zones : {
-          nat_gateway_id = aws_nat_gateway.ngw[az].id
-          route_table    = "${group.name}-${az}"
+          az          = az
+          route_table = "${group.name}-${az}"
       }] if group.type == "private"
     ]) : table.route_table => table
   }
 
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = each.value.nat_gateway_id
+  nat_gateway_id         = aws_nat_gateway.ngw[each.value.az].id
   route_table_id         = aws_route_table.route_table[each.value.route_table].id
 }
 

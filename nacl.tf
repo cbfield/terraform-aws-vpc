@@ -15,14 +15,13 @@ resource "aws_network_acl_rule" "ngw_ingress" {
     for group in var.subnet_groups : [
       for az in var.availability_zones : {
         az         = az
-        cidr_block = aws_subnet.subnet["${group.name}-${az}"].cidr_block
         group_name = group.name
       }
     ] if group.type == "private"
-    ]) : ingress.cidr_block => ingress
+    ]) : "${ingress.group_name}-${ingress.az}" => ingress
   }
 
-  cidr_block     = each.value.cidr_block
+  cidr_block     = aws_subnet.subnet["${each.value.group_name}-${each.value.az}"].cidr_block
   egress         = false
   from_port      = 0
   network_acl_id = aws_network_acl.ngw_nacl.id
@@ -62,21 +61,20 @@ resource "aws_network_acl_rule" "self_ingress" {
     for ingress in flatten([
       for group in var.subnet_groups : [
         for az in var.availability_zones : {
-          availability_zone = az
-          cidr_block        = aws_subnet.subnet["${group.name}-${az}"].cidr_block
-          group_name        = group.name
+          az         = az
+          group_name = group.name
         } if group.nacl.self_ingress == true
       ] if group.nacl != null
-    ]) : "${ingress.group_name}-${ingress.cidr_block}" => ingress
+    ]) : "${ingress.group_name}-${ingress.az}" => ingress
   }
 
-  cidr_block     = each.value.cidr_block
+  cidr_block     = aws_subnet.subnet["${each.value.group_name}-${each.value.az}"].cidr_block
   egress         = false
   from_port      = 0
   network_acl_id = aws_network_acl.nacl[each.value.group_name].id
   protocol       = "-1"
   rule_action    = "allow"
-  rule_number    = 1 + index(var.availability_zones, each.value.availability_zone)
+  rule_number    = 1 + index(var.availability_zones, each.value.az)
   to_port        = 0
 }
 
