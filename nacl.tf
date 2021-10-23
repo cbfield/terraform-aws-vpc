@@ -13,7 +13,7 @@ resource "aws_network_acl" "ngw_nacl" {
 resource "aws_network_acl_rule" "ngw_ingress" {
   for_each = toset(flatten([
     for group in var.subnet_groups : [
-      for az in group.availability_zones : aws_subnet.subnet["${var.name}-${group.name}-${az}"].cidr_block
+      for az in group.availability_zones : aws_subnet.subnet["${group.name}-${az}"].cidr_block
     ] if group.type == "private"
   ]))
 
@@ -41,7 +41,7 @@ resource "aws_network_acl_rule" "ngw_egress" {
 resource "aws_network_acl" "nacl" {
   for_each = { for group in var.subnet_groups : group.name => group }
 
-  subnet_ids = [for az in each.value.availability_zones : aws_subnet.subnet["${var.name}-${each.value.name}-${az}"].id]
+  subnet_ids = [for az in each.value.availability_zones : aws_subnet.subnet["${each.value.name}-${az}"].id]
   vpc_id     = aws_vpc.vpc.id
 
   tags = merge(each.value.tags, {
@@ -50,4 +50,29 @@ resource "aws_network_acl" "nacl" {
     "Name"                 = each.value.name
     "Type"                 = each.value.type
   })
+}
+
+resource "aws_network_acl_rule" "private_ingress" {
+  for_each = {
+    for ingress in flatten([
+      for private_group in var.subnet_groups : [
+        for public_group in var.subnet_groups : [
+          for az in public_group.availability_zones : {
+            private_group_name = private_group.name
+            public_group_name  = public_group.name
+            cidr_block         = aws_subnet.subnet["${public_group.name}-${az}"].cidr_block
+          }
+        ] if public_group.type == "public"
+      ] if private_group.type == "private"
+    ]) : "${ingress.public_group_name}-${ingress.cidr_block}" => ingress
+  }
+
+  cidr_block     = each.value.cidr_block
+  egress         = false
+  from_port      = 0
+  network_acl_id = aws_network_acl.nacl[each.value.private_group_name].id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1
+  to_port        = 0
 }

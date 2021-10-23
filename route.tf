@@ -4,7 +4,7 @@ resource "aws_route" "ngw_route" {
       for group in var.subnet_groups : [
         for az in group.availability_zones : {
           nat_gateway_id = aws_nat_gateway.ngw[az].id
-          route_table    = "${var.name}-${group.name}-${az}"
+          route_table    = "${group.name}-${az}"
       }] if group.type == "private"
     ]) : table.route_table => table
   }
@@ -17,7 +17,7 @@ resource "aws_route" "ngw_route" {
 resource "aws_route" "route" {
   for_each = {
     for route in flatten([
-      for group in var.subnet_groups : [
+      for group in var.subnet_groups : group.routes == null ? [] : [
         for route in group.routes :
         group.type == "public" || group.type == "persistence" ? [{
           carrier_gateway_id          = route.carrier_gateway_id
@@ -31,7 +31,7 @@ resource "aws_route" "route" {
           local_gateway_id            = route.local_gateway_id
           nat_gateway_id              = route.nat_gateway_id
           network_interface_id        = route.network_interface_id
-          route_table                 = "${var.name}-${group.name}"
+          route_table                 = group.name
           transit_gateway_id          = route.transit_gateway_id
           vpc_endpoint_id             = route.vpc_endpoint_id
           vpc_peering_connection_id   = route.vpc_peering_connection_id
@@ -48,7 +48,7 @@ resource "aws_route" "route" {
             local_gateway_id            = route.local_gateway_id
             nat_gateway_id              = route.nat_gateway_id
             network_interface_id        = route.network_interface_id
-            route_table                 = "${var.name}-${group.name}-${az}"
+            route_table                 = "${group.name}-${az}"
             transit_gateway_id          = route.transit_gateway_id
             vpc_endpoint_id             = route.vpc_endpoint_id
             vpc_peering_connection_id   = route.vpc_peering_connection_id

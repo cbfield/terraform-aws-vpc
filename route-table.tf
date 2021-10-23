@@ -14,13 +14,13 @@ resource "aws_route_table" "route_table" {
       for group in var.subnet_groups : [
         group.type == "public" || group.type == "persistence" ? [{
           availability_zone = join(",", group.availability_zones)
-          name              = "${var.name}-${group.name}"
+          name              = group.name
           tags              = group.tags
           type              = group.type
           }] : [
           for az in group.availability_zones : {
             availability_zone = az
-            name              = "${var.name}-${group.name}-${az}"
+            name              = "${group.name}-${az}"
             tags              = group.tags
             type              = group.type
         }]
@@ -32,7 +32,7 @@ resource "aws_route_table" "route_table" {
   tags = merge(each.value.tags, {
     "Availability Zones"   = each.value.availability_zone
     "Managed By Terraform" = "true"
-    "Name"                 = each.value.name
+    "Name"                 = "${var.name}-${each.value.name}"
     "Type"                 = each.value.type
   })
 }
@@ -43,7 +43,7 @@ resource "aws_route_table_association" "ngw_igw_association" {
 }
 
 resource "aws_route_table_association" "igw_association" {
-  for_each = { for group in var.subnet_groups : "${var.name}-${group.name}" => group if group.type == "public" }
+  for_each = { for group in var.subnet_groups : group.name => group if group.type == "public" }
 
   route_table_id = aws_route_table.route_table[each.key].id
   gateway_id     = aws_internet_gateway.igw.id

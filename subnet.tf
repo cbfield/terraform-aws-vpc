@@ -33,7 +33,7 @@ resource "aws_subnet" "subnet" {
             map_public_ip_on_launch         = group.map_public_ip_on_launch
             outpost_arn                     = group.outpost_arn
             group_name                      = group.name
-            name                            = "${var.name}-${group.name}-${az}"
+            name                            = "${group.name}-${az}"
             tags                            = group.tags
             type                            = group.type
           }
@@ -55,7 +55,7 @@ resource "aws_subnet" "subnet" {
   tags = merge(each.value.tags, {
     "Availability Zone"    = each.value.availability_zone
     "Managed By Terraform" = "true"
-    "Name"                 = each.value.name
+    "Name"                 = "${var.name}-${each.value.name}"
     "Type"                 = each.value.type
   })
 }
