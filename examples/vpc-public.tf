@@ -8,6 +8,18 @@ module "public_vpc" {
     "us-east-1b",
   ]
 
+  bastion = {
+    ami = data.aws_ami.al2.id
+    subnets = [
+      module.public_vpc.vpc.subnets["front-end"]["us-east-1a"].id,
+      module.public_vpc.vpc.subnets["back-end"]["us-east-1a"].id,
+    ]
+    ingress = {
+      cidr_blocks     = ["10.20.0.0/16"]
+      security_groups = ["sg-123123"]
+    }
+  }
+
   subnet_groups = [
     {
       type         = "public"

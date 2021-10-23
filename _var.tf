@@ -9,6 +9,20 @@ variable "availability_zones" {
   type        = list(string)
 }
 
+variable "bastion" {
+  description = "Configurations for bastion hosts in this VPC"
+  type = object({
+    ami        = optional(string)
+    public_key = optional(string)
+    subnets    = list(string)
+    ingress = optional(object({
+      cidr_blocks     = optional(list(string))
+      security_groups = optional(list(string))
+    }))
+  })
+  default = {}
+}
+
 variable "cidr_block" {
   description = "A CIDR block to assign to the VPC"
   type        = string
