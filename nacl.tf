@@ -10,6 +10,34 @@ resource "aws_network_acl" "ngw_nacl" {
   }
 }
 
+resource "aws_network_acl_rule" "ngw_ingress" {
+  for_each = toset(flatten([
+    for group in var.subnet_groups : [
+      for az in group.availability_zones : aws_subnet.subnet["${var.name}-${group.name}-${az}"].cidr_block
+    ] if group.type == "private"
+  ]))
+
+  cidr_block     = each.value
+  egress         = false
+  from_port      = 0
+  network_acl_id = aws_network_acl.ngw_nacl.id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1
+  to_port        = 0
+}
+
+resource "aws_network_acl_rule" "ngw_egress" {
+  cidr_block     = "0.0.0.0/0"
+  egress         = true
+  from_port      = 0
+  network_acl_id = aws_network_acl.ngw_nacl.id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1
+  to_port        = 0
+}
+
 resource "aws_network_acl" "nacl" {
   for_each = { for group in var.subnet_groups : group.name => group }
 
