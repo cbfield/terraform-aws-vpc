@@ -6,8 +6,8 @@ module "my_vpc" {
 
   subnet_groups = [
     {
-      type         = "private"
-      name         = "private-default"
+      type         = "public"
+      name         = "public-default"
       newbits      = 8
       first_netnum = 1
       availability_zones = [
