@@ -80,4 +80,56 @@ resource "aws_network_acl_rule" "self_ingress" {
   to_port        = 0
 }
 
-# TODO NACL rules given by arguments
+resource "aws_network_acl_rule" "ingress" {
+  for_each = {
+    for ingress in flatten([
+      for group in [for g in var.subnet_groups : g if g.nacl != null] : [
+        for rule in group.nacl.ingress : {
+          cidr_block  = rule.cidr_block
+          from_port   = rule.from_port
+          group_name  = group.name
+          protocol    = rule.protocol
+          rule_action = rule.rule_action
+          rule_number = rule.rule_number
+          to_port     = rule.to_port
+        }
+      ] if group.nacl.ingress != null
+    ]) : "${ingress.group_name}-${ingress.cidr_block}" => ingress
+  }
+
+  cidr_block     = each.value.cidr_block
+  egress         = false
+  from_port      = each.value.from_port
+  network_acl_id = aws_network_acl.nacl[each.value.group_name].id
+  protocol       = each.value.protocol
+  rule_action    = each.value.rule_action
+  rule_number    = each.value.rule_number
+  to_port        = each.value.to_port
+}
+
+resource "aws_network_acl_rule" "egress" {
+  for_each = {
+    for egress in flatten([
+      for group in [for g in var.subnet_groups : g if g.nacl != null] : [
+        for rule in group.nacl.egress : {
+          cidr_block  = rule.cidr_block
+          from_port   = rule.from_port
+          group_name  = group.name
+          protocol    = rule.protocol
+          rule_action = rule.rule_action
+          rule_number = rule.rule_number
+          to_port     = rule.to_port
+        }
+      ] if group.nacl.egress != null
+    ]) : "${egress.group_name}-${egress.cidr_block}" => egress
+  }
+
+  cidr_block     = each.value.cidr_block
+  egress         = true
+  from_port      = each.value.from_port
+  network_acl_id = aws_network_acl.nacl[each.value.group_name].id
+  protocol       = each.value.protocol
+  rule_action    = each.value.rule_action
+  rule_number    = each.value.rule_number
+  to_port        = each.value.to_port
+}

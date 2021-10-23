@@ -48,6 +48,14 @@ output "internet_gateway" {
   value       = aws_internet_gateway.igw
 }
 
+output "nacl_rules" {
+  description = "NACL rules created for the NACLs in this VPC"
+  value = {
+    egress  = aws_network_acl_rule.egress
+    ingress = aws_network_acl_rule.ingress
+  }
+}
+
 output "nacls" {
   description = "NACLs created for subnet groups in this VPC"
   value       = aws_network_acl.nacl

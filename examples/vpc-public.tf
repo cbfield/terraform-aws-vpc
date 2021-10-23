@@ -14,6 +14,24 @@ module "public_vpc" {
       name         = "front-end"
       newbits      = 8
       first_netnum = 1
+      nacl = {
+        ingress = [{
+          cidr_block  = "0.0.0.0/0"
+          from_port   = 0
+          protocol    = "-1"
+          rule_action = "allow"
+          rule_number = 1000
+          to_port     = 0
+        }]
+        egress = [{
+          cidr_block  = "0.0.0.0/0"
+          from_port   = 0
+          protocol    = "-1"
+          rule_action = "allow"
+          rule_number = 1000
+          to_port     = 0
+        }]
+      }
     },
     {
       type         = "private"
