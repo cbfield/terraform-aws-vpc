@@ -106,6 +106,19 @@ resource "aws_network_acl_rule" "private_ingress" {
   to_port        = 0
 }
 
+resource "aws_network_acl_rule" "egress" {
+  for_each = { for group in var.subnet_groups : group.name => group if group.type == "public" || group.type == "private" }
+
+  cidr_block     = "0.0.0.0/0"
+  egress         = true
+  from_port      = 0
+  network_acl_id = aws_network_acl.nacl[each.value.name].id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1
+  to_port        = 0
+}
+
 resource "aws_network_acl_rule" "persistence_ingress" {
   for_each = {
     for ingress in flatten([
