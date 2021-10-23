@@ -2,7 +2,7 @@ resource "aws_route" "ngw_route" {
   for_each = {
     for table in flatten([
       for group in var.subnet_groups : [
-        for az in group.availability_zones : {
+        for az in var.availability_zones : {
           nat_gateway_id = aws_nat_gateway.ngw[az].id
           route_table    = "${group.name}-${az}"
       }] if group.type == "private"
@@ -36,7 +36,7 @@ resource "aws_route" "route" {
           vpc_endpoint_id             = route.vpc_endpoint_id
           vpc_peering_connection_id   = route.vpc_peering_connection_id
           }] : [
-          for az in group.availability_zones : {
+          for az in var.availability_zones : {
             carrier_gateway_id          = route.carrier_gateway_id
             destination                 = route.destination_cidr_block != null ? route.destination_cidr_block : route.destination_ipv6_cidr_block != null ? route.destination_ipv6_cidr_block : route.destination_prefix_list_id
             destination_cidr_block      = route.destination_cidr_block

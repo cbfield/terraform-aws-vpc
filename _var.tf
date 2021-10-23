@@ -4,6 +4,11 @@ variable "assign_generated_ipv6_cidr_block" {
   default     = false
 }
 
+variable "availability_zones" {
+  description = "Availability zones to distribute resources within"
+  type        = list(string)
+}
+
 variable "cidr_block" {
   description = "A CIDR block to assign to the VPC"
   type        = string
@@ -78,7 +83,6 @@ variable "subnet_groups" {
   description = "Configurations for groups of subnets. TODO better description"
   type = list(object({
     assign_ipv6_address_on_creation = optional(bool)
-    availability_zones              = list(string)
     customer_owned_ipv4_pool        = optional(string)
     first_netnum                    = number
     ipv6_first_netnum               = optional(number)

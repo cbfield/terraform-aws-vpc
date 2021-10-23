@@ -1,7 +1,7 @@
 resource "aws_route_table" "ngw_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    "Availability Zones"   = join(",", local.zones)
+    "Availability Zones"   = join(",", var.availability_zones)
     "Managed By Terraform" = "true"
     "Name"                 = "${var.name}-nat-gateway"
     "Type"                 = "public"
@@ -13,12 +13,12 @@ resource "aws_route_table" "route_table" {
     for table in flatten([
       for group in var.subnet_groups : [
         group.type == "public" || group.type == "persistence" ? [{
-          availability_zone = join(",", group.availability_zones)
+          availability_zone = join(",", var.availability_zones)
           name              = group.name
           tags              = group.tags
           type              = group.type
           }] : [
-          for az in group.availability_zones : {
+          for az in var.availability_zones : {
             availability_zone = az
             name              = "${group.name}-${az}"
             tags              = group.tags

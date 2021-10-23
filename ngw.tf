@@ -1,5 +1,5 @@
 resource "aws_nat_gateway" "ngw" {
-  for_each = toset(local.zones)
+  for_each = toset(var.availability_zones)
 
   allocation_id = aws_eip.ngw_eip[each.key].id
   subnet_id     = aws_subnet.ngw_subnet[each.key].id
@@ -12,7 +12,7 @@ resource "aws_nat_gateway" "ngw" {
 }
 
 resource "aws_eip" "ngw_eip" {
-  for_each = toset(local.zones)
+  for_each = toset(var.availability_zones)
 
   vpc = true
 
