@@ -28,7 +28,7 @@ resource "aws_network_acl_rule" "ngw_ingress" {
   network_acl_id = aws_network_acl.ngw_nacl.id
   protocol       = "-1"
   rule_action    = "allow"
-  rule_number    = 1 + index(var.availability_zones, each.value.az) + (10 * (1 + index(local.subnet_groups, each.value.group_name)))
+  rule_number    = 1 + index(var.availability_zones, each.value.az) + (10 * (1 + index(sort([for group in var.subnet_groups : group.name]), each.value.group_name)))
   to_port        = 0
 }
 
