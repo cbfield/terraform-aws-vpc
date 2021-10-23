@@ -1,3 +1,23 @@
+resource "aws_subnet" "ngw_subnet" {
+  for_each = {
+    for az in toset(local.availability_zones) : az => {
+      availability_zone = az
+      cidr_block        = cidrsubnet(var.cidr_block, local.min_newbits, index(local.availability_zones, az))
+      name              = "${var.name}-nat-gateway-${az}"
+  } }
+
+  availability_zone = each.value.availability_zone
+  cidr_block        = each.value.cidr_block
+  vpc_id            = aws_vpc.vpc.id
+
+  tags = {
+    "Availability Zone"    = each.value.availability_zone
+    "Managed By Terraform" = "true"
+    "Name"                 = each.value.name
+    "Type"                 = "public"
+  }
+}
+
 resource "aws_subnet" "subnet" {
   for_each = {
     for subnet in flatten([
@@ -38,24 +58,4 @@ resource "aws_subnet" "subnet" {
     "Name"                 = each.value.name
     "Type"                 = each.value.type
   })
-}
-
-resource "aws_subnet" "ngw_subnet" {
-  for_each = {
-    for az in toset(local.availability_zones) : az => {
-      availability_zone = az
-      cidr_block        = cidrsubnet(var.cidr_block, local.min_newbits, index(local.availability_zones, az))
-      name              = "${var.name}-nat-gateway-${az}"
-  } }
-
-  availability_zone = each.value.availability_zone
-  cidr_block        = each.value.cidr_block
-  vpc_id            = aws_vpc.vpc.id
-
-  tags = {
-    "Availability Zone"    = each.value.availability_zone
-    "Managed By Terraform" = "true"
-    "Name"                 = each.value.name
-    "Type"                 = "public"
-  }
 }
