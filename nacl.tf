@@ -52,6 +52,29 @@ resource "aws_network_acl" "nacl" {
   })
 }
 
+resource "aws_network_acl_rule" "self_ingress" {
+  for_each = {
+    for ingress in flatten([
+      for group in var.subnet_groups : [
+        for az in group.availability_zones : {
+          availability_zone = az
+          cidr_block        = aws_subnet.subnet["${group.name}-${az}"].cidr_block
+          group_name        = group.name
+        }
+      ] if group.type != "persistence"
+    ]) : "${ingress.group_name}-${ingress.cidr_block}" => ingress
+  }
+
+  cidr_block     = each.value.cidr_block
+  egress         = false
+  from_port      = 0
+  network_acl_id = aws_network_acl.nacl[each.value.group_name].id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1 + index(local.availability_zones, each.value.availability_zone)
+  to_port        = 0
+}
+
 resource "aws_network_acl_rule" "private_ingress" {
   for_each = {
     for ingress in flatten([
