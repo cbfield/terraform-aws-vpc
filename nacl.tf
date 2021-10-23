@@ -105,3 +105,29 @@ resource "aws_network_acl_rule" "private_ingress" {
   rule_number    = 1 + index(local.zones, each.value.az) + (10 * (1 + index(local.subnet_groups, each.value.public_group_name)))
   to_port        = 0
 }
+
+resource "aws_network_acl_rule" "persistence_ingress" {
+  for_each = {
+    for ingress in flatten([
+      for persistence_group in var.subnet_groups : [
+        for private_group in var.subnet_groups : [
+          for az in private_group.availability_zones : {
+            az                     = az
+            persistence_group_name = persistence_group.name
+            private_group_name     = private_group.name
+            cidr_block             = aws_subnet.subnet["${private_group.name}-${az}"].cidr_block
+          }
+        ] if private_group.type == "private"
+      ] if persistence_group.type == "persistence"
+    ]) : "${ingress.private_group_name}-${ingress.cidr_block}" => ingress
+  }
+
+  cidr_block     = each.value.cidr_block
+  egress         = false
+  from_port      = 0
+  network_acl_id = aws_network_acl.nacl[each.value.persistence_group_name].id
+  protocol       = "-1"
+  rule_action    = "allow"
+  rule_number    = 1 + index(local.zones, each.value.az) + (10 * (1 + index(local.subnet_groups, each.value.private_group_name)))
+  to_port        = 0
+}

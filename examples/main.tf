@@ -25,5 +25,15 @@ module "my_vpc" {
         "us-east-1b",
       ]
     },
+    {
+      type         = "persistence"
+      name         = "persistence-default"
+      newbits      = 8
+      first_netnum = 5
+      availability_zones = [
+        "us-east-1a",
+        "us-east-1b",
+      ]
+    },
   ]
 }
