@@ -30,7 +30,7 @@ resource "aws_subnet" "subnet" {
             customer_owned_ipv4_pool        = group.customer_owned_ipv4_pool
             ipv6_cidr_block                 = var.assign_generated_ipv6_cidr_block == null || group.ipv6_prefix == null || group.ipv6_newbits == null ? null : cidrsubnet(aws_vpc.vpc.ipv6_cidr_block, group.ipv6_newbits, group.ipv6_first_netnum + index(sort(var.availability_zones), az))
             map_customer_owned_ip_on_launch = group.map_customer_owned_ip_on_launch
-            map_public_ip_on_launch         = group.map_public_ip_on_launch
+            map_public_ip_on_launch         = group.map_public_ip_on_launch != null ? group.map_public_ip_on_launch : group.type == "public" ? true : false
             outpost_arn                     = group.outpost_arn
             group_name                      = group.name
             name                            = "${group.name}-${az}"

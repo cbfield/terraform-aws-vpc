@@ -1,4 +1,6 @@
 data "aws_ami" "al2" {
+  count = var.bastion != null ? var.bastion.ami == null ? 1 : 0 : 0
+
   most_recent = true
   owners      = ["amazon"]
 

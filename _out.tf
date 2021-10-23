@@ -3,6 +3,31 @@ output "assign_generated_ipv6_cidr_block" {
   value       = var.assign_generated_ipv6_cidr_block
 }
 
+output "bastion" {
+  description = "The value provided for var.bastion"
+  value       = var.bastion
+}
+
+output "bastion_instances" {
+  description = "The ec2 instaces created as bastion hosts in this VPC"
+  value       = aws_instance.bastion
+}
+
+output "bastion_ec2_key" {
+  description = "The EC2 keypair created to provide access to the bastions, if they were created"
+  value       = var.bastion != null ? aws_key_pair.bastion_ec2_key.0 : null
+}
+
+output "bastion_security_group" {
+  description = "The security group created for the bastion hosts, if they were created"
+  value       = var.bastion != null ? aws_security_group.bastion.0 : null
+}
+
+output "bastion_ssh_key" {
+  description = "The tls key created to provide access to the bastions, if one was not provided"
+  value       = var.bastion != null ? var.bastion.public_key == null ? tls_private_key.bastion_ssh_key.0 : null : null
+}
+
 output "cidr_block" {
   description = "The value provided for var.cidr_block"
   value       = var.cidr_block

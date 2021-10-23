@@ -20,7 +20,7 @@ variable "bastion" {
       security_groups = optional(list(string))
     }))
   })
-  default = {}
+  default = null
 }
 
 variable "cidr_block" {

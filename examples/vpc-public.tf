@@ -11,8 +11,8 @@ module "public_vpc" {
   bastion = {
     ami = data.aws_ami.al2.id
     subnets = [
-      module.public_vpc.vpc.subnets["front-end"]["us-east-1a"].id,
-      module.public_vpc.vpc.subnets["back-end"]["us-east-1a"].id,
+      "sg-123123", # module.public_vpc.vpc.subnets["front-end"]["us-east-1a"].id,
+      "sg-234234", # module.public_vpc.vpc.subnets["back-end"]["us-east-1a"].id,
     ]
     ingress = {
       cidr_blocks     = ["10.20.0.0/16"]
