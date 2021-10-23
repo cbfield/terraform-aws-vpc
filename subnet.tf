@@ -1,8 +1,8 @@
 resource "aws_subnet" "ngw_subnet" {
   for_each = {
-    for az in toset(local.availability_zones) : az => {
+    for az in toset(local.zones) : az => {
       availability_zone = az
-      cidr_block        = cidrsubnet(var.cidr_block, local.min_newbits, index(local.availability_zones, az))
+      cidr_block        = cidrsubnet(var.cidr_block, local.min_newbits, index(local.zones, az))
       name              = "${var.name}-nat-gateway-${az}"
   } }
 

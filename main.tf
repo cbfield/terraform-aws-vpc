@@ -8,7 +8,7 @@ resource "aws_vpc" "vpc" {
   instance_tenancy                 = var.instance_tenancy
 
   tags = merge(var.tags, {
-    "Availability Zones"   = join(",", local.availability_zones)
+    "Availability Zones"   = join(",", local.zones)
     "Managed By Terraform" = "true"
     "Name"                 = var.name
   })

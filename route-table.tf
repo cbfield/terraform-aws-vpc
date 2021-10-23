@@ -1,7 +1,7 @@
 resource "aws_route_table" "ngw_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    "Availability Zones"   = join(",", local.availability_zones)
+    "Availability Zones"   = join(",", local.zones)
     "Managed By Terraform" = "true"
     "Name"                 = "${var.name}-nat-gateway"
     "Type"                 = "public"
