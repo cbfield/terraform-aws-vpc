@@ -33,6 +33,7 @@ resource "aws_subnet" "subnet" {
   vpc_id                          = aws_vpc.vpc.id
 
   tags = merge(each.value.tags, {
+    "Availability Zone"    = each.value.availability_zone
     "Managed By Terraform" = "true"
     "Name"                 = each.value.name
     "Type"                 = each.value.type
@@ -52,6 +53,7 @@ resource "aws_subnet" "ngw_subnet" {
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
+    "Availability Zone"    = each.value.availability_zone
     "Managed By Terraform" = "true"
     "Name"                 = each.value.name
     "Type"                 = "public"

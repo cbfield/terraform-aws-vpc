@@ -17,6 +17,7 @@ resource "aws_eip" "ngw_eip" {
   vpc = true
 
   tags = {
+    "Availability Zone"    = each.key
     "Managed By Terraform" = "true"
     "Name"                 = "${var.name}-nat-gateway-${each.key}"
   }

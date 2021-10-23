@@ -5,6 +5,7 @@ resource "aws_network_acl" "nacl" {
   vpc_id     = aws_vpc.vpc.id
 
   tags = merge(each.value.tags, {
+    "Availability Zones"   = join(",", each.value.availability_zones)
     "Managed By Terraform" = "true"
     "Name"                 = each.value.name
     "Type"                 = each.value.type
