@@ -107,7 +107,8 @@ variable "subnet_groups" {
         rule_number = number
         to_port     = number
       })))
-      tags = optional(map(string))
+      self_ingress = optional(bool)
+      tags         = optional(map(string))
     }))
     name             = string
     newbits          = number

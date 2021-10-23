@@ -19,7 +19,7 @@ resource "aws_route" "route" {
     for route in flatten([
       for group in var.subnet_groups : group.routes == null ? [] : [
         for route in group.routes :
-        group.type == "public" || group.type == "persistence" ? [{
+        group.type == "public" || group.type == "airgapped" ? [{
           carrier_gateway_id          = route.carrier_gateway_id
           destination                 = route.destination_cidr_block != null ? route.destination_cidr_block : route.destination_ipv6_cidr_block != null ? route.destination_ipv6_cidr_block : route.destination_prefix_list_id
           destination_cidr_block      = route.destination_cidr_block

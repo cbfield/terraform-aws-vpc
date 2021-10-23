@@ -12,7 +12,7 @@ resource "aws_route_table" "route_table" {
   for_each = {
     for table in flatten([
       for group in var.subnet_groups : [
-        group.type == "public" || group.type == "persistence" ? [{
+        group.type == "public" || group.type == "airgapped" ? [{
           availability_zone = join(",", var.availability_zones)
           name              = group.name
           tags              = group.tags

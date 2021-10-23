@@ -65,8 +65,8 @@ resource "aws_network_acl_rule" "self_ingress" {
           availability_zone = az
           cidr_block        = aws_subnet.subnet["${group.name}-${az}"].cidr_block
           group_name        = group.name
-        }
-      ] if group.type != "persistence"
+        } if group.nacl.self_ingress == true
+      ] if group.nacl != null
     ]) : "${ingress.group_name}-${ingress.cidr_block}" => ingress
   }
 
