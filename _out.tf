@@ -133,7 +133,19 @@ output "ngw_subnets" {
 
 output "route_tables" {
   description = "Route tables created for subnet groups in this VPC"
-  value       = aws_route_table.route_table
+  value = {
+    airgapped = {
+      for group in var.subnet_groups : group.name => aws_route_table.route_table[group.name] if group.type == "airgapped"
+    }
+    private = {
+      for group in var.subnet_groups : group.name => {
+        for az in var.availability_zones : az => aws_route_table.route_table["${group.name}-${az}"]
+      } if group.type == "private"
+    }
+    public = {
+      for group in var.subnet_groups : group.name => aws_route_table.route_table[group.name] if group.type == "public"
+    }
+  }
 }
 
 output "routes" {
