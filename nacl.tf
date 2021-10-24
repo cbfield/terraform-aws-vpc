@@ -11,13 +11,14 @@ resource "aws_network_acl" "ngw_nacl" {
 }
 
 resource "aws_network_acl_rule" "ngw_ingress" {
-  for_each = { for ingress in flatten([
-    for group in var.subnet_groups : [
-      for az in var.availability_zones : {
-        az         = az
-        group_name = group.name
-      }
-    ] if group.type == "private"
+  for_each = {
+    for ingress in flatten([
+      for group in var.subnet_groups : [
+        for az in var.availability_zones : {
+          az         = az
+          group_name = group.name
+        }
+      ] if group.type == "private"
     ]) : "${ingress.group_name}-${ingress.az}" => ingress
   }
 
@@ -27,8 +28,12 @@ resource "aws_network_acl_rule" "ngw_ingress" {
   network_acl_id = aws_network_acl.ngw_nacl.id
   protocol       = "-1"
   rule_action    = "allow"
-  rule_number    = 1 + index(var.availability_zones, each.value.az) + (10 * (1 + index(sort([for group in var.subnet_groups : group.name]), each.value.group_name)))
   to_port        = 0
+
+  rule_number = (
+    (1 + index(var.availability_zones, each.value.az)) +
+    (10 * (1 + index(sort(var.subnet_groups[*].name), each.value.group_name)))
+  )
 }
 
 resource "aws_network_acl_rule" "ngw_egress" {
@@ -82,15 +87,9 @@ resource "aws_network_acl_rule" "ingress" {
   for_each = {
     for ingress in flatten([
       for group in [for g in var.subnet_groups : g if g.nacl != null] : [
-        for rule in group.nacl.ingress : {
-          cidr_block  = rule.cidr_block
-          from_port   = rule.from_port
-          group_name  = group.name
-          protocol    = rule.protocol
-          rule_action = rule.rule_action
-          rule_number = rule.rule_number
-          to_port     = rule.to_port
-        }
+        for rule in group.nacl.ingress : (
+          merge(rule, { group_name = group.name })
+        )
       ] if group.nacl.ingress != null
     ]) : "${ingress.group_name}-${ingress.cidr_block}" => ingress
   }
@@ -109,15 +108,9 @@ resource "aws_network_acl_rule" "egress" {
   for_each = {
     for egress in flatten([
       for group in [for g in var.subnet_groups : g if g.nacl != null] : [
-        for rule in group.nacl.egress : {
-          cidr_block  = rule.cidr_block
-          from_port   = rule.from_port
-          group_name  = group.name
-          protocol    = rule.protocol
-          rule_action = rule.rule_action
-          rule_number = rule.rule_number
-          to_port     = rule.to_port
-        }
+        for rule in group.nacl.egress : (
+          merge(rule, { group_name = group.name })
+        )
       ] if group.nacl.egress != null
     ]) : "${egress.group_name}-${egress.cidr_block}" => egress
   }

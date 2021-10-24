@@ -1,5 +1,11 @@
 resource "aws_instance" "bastion" {
-  for_each = var.bastion != null ? var.bastion.subnets != null ? toset(var.bastion.subnets) : toset([]) : toset([])
+  for_each = (
+    var.bastion != null ? (
+      var.bastion.subnets != null ? (
+        toset(var.bastion.subnets)
+      ) : toset([])
+    ) : toset([])
+  )
 
   ami                    = var.bastion.ami != null ? var.bastion.ami : data.aws_ami.al2.0.id
   instance_type          = "t2.micro"
@@ -30,8 +36,13 @@ resource "tls_private_key" "bastion_ssh_key" {
 resource "aws_key_pair" "bastion_ec2_key" {
   count = var.bastion != null ? 1 : 0
 
-  key_name   = "${var.name}-bastion"
-  public_key = var.bastion.public_key != null ? var.bastion.public_key : tls_private_key.bastion_ssh_key.0.public_key_openssh
+  key_name = "${var.name}-bastion"
+
+  public_key = var.bastion.public_key != null ? (
+    var.bastion.public_key
+    ) : (
+    tls_private_key.bastion_ssh_key.0.public_key_openssh
+  )
 
   tags = {
     "Managed By Terraform" = "true"
@@ -62,7 +73,15 @@ resource "aws_security_group_rule" "bastion_self_ingress" {
 }
 
 resource "aws_security_group_rule" "bastion_cidr_ingress" {
-  count = var.bastion != null ? var.bastion.ingress != null ? var.bastion.ingress.cidr_blocks != null ? length(var.bastion.ingress.cidr_blocks) > 0 ? 1 : 0 : 0 : 0 : 0
+  count = (
+    var.bastion != null ? (
+      var.bastion.ingress != null ? (
+        var.bastion.ingress.cidr_blocks != null ? (
+          length(var.bastion.ingress.cidr_blocks) > 0 ? 1 : 0
+        ) : 0
+      ) : 0
+    ) : 0
+  )
 
   cidr_blocks       = var.bastion.ingress.cidr_blocks
   from_port         = 22
@@ -73,7 +92,15 @@ resource "aws_security_group_rule" "bastion_cidr_ingress" {
 }
 
 resource "aws_security_group_rule" "bastion_sg_ingress" {
-  for_each = var.bastion != null ? var.bastion.ingress != null ? var.bastion.ingress.security_groups != null ? toset(var.bastion.ingress.security_groups) : toset([]) : toset([]) : toset([])
+  for_each = (
+    var.bastion != null ? (
+      var.bastion.ingress != null ? (
+        var.bastion.ingress.security_groups != null ? (
+          toset(var.bastion.ingress.security_groups)
+        ) : toset([])
+      ) : toset([])
+    ) : toset([])
+  )
 
   from_port                = 22
   protocol                 = "tcp"

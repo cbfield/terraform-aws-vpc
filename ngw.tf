@@ -28,17 +28,22 @@ resource "aws_eip" "ngw_eip" {
 resource "aws_subnet" "ngw_subnet" {
   for_each = {
     for az in toset(var.availability_zones) : az => {
-      availability_zone = az
-      cidr_block        = cidrsubnet(var.cidr_block, 28 - parseint(split("/", var.cidr_block)[1], 10), index(var.availability_zones, az))
-      name              = "${var.name}-nat-gateway-${az}"
-  } }
+      az   = az
+      name = "${var.name}-nat-gateway-${az}"
+      cidr_block = cidrsubnet(
+        var.cidr_block,
+        28 - parseint(split("/", var.cidr_block)[1], 10),
+        index(var.availability_zones, az)
+      )
+    }
+  }
 
-  availability_zone = each.value.availability_zone
+  availability_zone = each.value.az
   cidr_block        = each.value.cidr_block
   vpc_id            = aws_vpc.vpc.id
 
   tags = {
-    "Availability Zone"    = each.value.availability_zone
+    "Availability Zone"    = each.value.az
     "Managed By Terraform" = "true"
     "Name"                 = each.value.name
     "Type"                 = "public"

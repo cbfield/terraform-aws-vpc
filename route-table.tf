@@ -6,8 +6,7 @@ resource "aws_route_table" "route_table" {
           for az in var.availability_zones : merge(group, {
             az = az
             id = "${group.name}-${az}"
-          })
-          ] : [
+          })] : [
           merge(group, {
             az = join(",", var.availability_zones)
             id = group.name
