@@ -116,11 +116,6 @@ output "ngw_nacl_ingress" {
   value       = aws_network_acl_rule.ngw_ingress
 }
 
-output "ngw_routes" {
-  description = "Routes in the nat gateway route table"
-  value       = aws_route.ngw_route
-}
-
 output "ngw_route_table" {
   description = "The route table used by the nat gateways in this VPC"
   value       = aws_route_table.ngw_route_table
@@ -146,11 +141,6 @@ output "route_tables" {
       for group in var.subnet_groups : group.name => aws_route_table.route_table[group.name] if group.type == "public"
     }
   }
-}
-
-output "routes" {
-  description = "Routes assigned to the route tables in this VPC"
-  value       = aws_route.route
 }
 
 output "subnet_groups" {

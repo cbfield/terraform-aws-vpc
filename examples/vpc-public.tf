@@ -26,24 +26,12 @@ module "public_vpc" {
       name         = "front-end"
       newbits      = 8
       first_netnum = 1
-      nacl = {
-        ingress = [{
-          cidr_block  = "0.0.0.0/0"
-          from_port   = 0
-          protocol    = "-1"
-          rule_action = "allow"
-          rule_number = 1000
-          to_port     = 0
-        }]
-        egress = [{
-          cidr_block  = "0.0.0.0/0"
-          from_port   = 0
-          protocol    = "-1"
-          rule_action = "allow"
-          rule_number = 1000
-          to_port     = 0
-        }]
-      }
+      routes = [
+        {
+          cidr_block         = "10.20.0.0/16"
+          transit_gateway_id = "tgw-123123"
+        }
+      ]
     },
     {
       type         = "private"

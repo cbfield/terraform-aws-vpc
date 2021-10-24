@@ -1,50 +1,69 @@
-resource "aws_route_table" "ngw_route_table" {
-  vpc_id = aws_vpc.vpc.id
-  tags = {
-    "Availability Zones"   = join(",", var.availability_zones)
-    "Managed By Terraform" = "true"
-    "Name"                 = "${var.name}-nat-gateway"
-    "Type"                 = "public"
-  }
-}
-
 resource "aws_route_table" "route_table" {
   for_each = {
     for table in flatten([
       for group in var.subnet_groups : [
-        group.type == "public" || group.type == "airgapped" ? [{
-          availability_zone = join(",", var.availability_zones)
-          name              = group.name
-          tags              = group.tags
-          type              = group.type
-          }] : [
-          for az in var.availability_zones : {
-            availability_zone = az
-            name              = "${group.name}-${az}"
-            tags              = group.tags
-            type              = group.type
-        }]
+        group.type == "private" ? [
+          for az in var.availability_zones : merge(group, {
+            az = az
+            id = "${group.name}-${az}"
+          })
+          ] : [
+          merge(group, {
+            az = join(",", var.availability_zones)
+            id = group.name
+        })]
       ]
-    ]) : table.name => table
+    ]) : table.id => table
+  }
+
+  dynamic "route" {
+    for_each = each.value.routes == null ? {} : {
+      for route in each.value.routes : (
+        route.cidr_block != null ? route.cidr_block : (
+          route.ipv6_cidr_block != null ? route.ipv6_cidr_block : route.prefix_list_id
+        )
+      ) => route
+    }
+
+    content {
+      cidr_block                 = route.value.cidr_block
+      ipv6_cidr_block            = route.value.ipv6_cidr_block
+      destination_prefix_list_id = route.value.prefix_list_id
+      carrier_gateway_id         = route.value.carrier_gateway_id
+      gateway_id                 = route.value.gateway_id
+      instance_id                = route.value.instance_id
+      nat_gateway_id             = route.value.nat_gateway_id
+      network_interface_id       = route.value.network_interface_id
+      transit_gateway_id         = route.value.transit_gateway_id
+      vpc_endpoint_id            = route.value.vpc_endpoint_id
+      vpc_peering_connection_id  = route.value.vpc_peering_connection_id
+    }
+  }
+
+  dynamic "route" {
+    for_each = each.value.type == "private" ? toset([1]) : toset([])
+
+    content {
+      cidr_block     = "0.0.0.0/0"
+      nat_gateway_id = aws_nat_gateway.ngw[each.value.az].id
+    }
+  }
+
+  dynamic "route" {
+    for_each = each.value.type == "public" ? toset([1]) : toset([])
+
+    content {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.igw.id
+    }
   }
 
   vpc_id = aws_vpc.vpc.id
+
   tags = merge(each.value.tags, {
-    "Availability Zones"   = each.value.availability_zone
+    "Availability Zones"   = each.value.az
     "Managed By Terraform" = "true"
-    "Name"                 = "${var.name}-${each.value.name}"
+    "Name"                 = "${var.name}-${each.value.id}"
     "Type"                 = each.value.type
   })
-}
-
-resource "aws_route_table_association" "ngw_igw_association" {
-  route_table_id = aws_route_table.ngw_route_table.id
-  gateway_id     = aws_internet_gateway.igw.id
-}
-
-resource "aws_route_table_association" "public_igw_association" {
-  for_each = { for group in var.subnet_groups : group.name => group if group.type == "public" }
-
-  route_table_id = aws_route_table.route_table[each.key].id
-  gateway_id     = aws_internet_gateway.igw.id
 }
