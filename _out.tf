@@ -75,7 +75,9 @@ output "internet_gateway" {
 
 output "nacls" {
   description = "NACLs created for subnet groups in this VPC"
-  value       = aws_network_acl.nacl
+  value = {
+    for group in var.subnet_groups : group.name => aws_network_acl.nacl[group.name]
+  }
 }
 
 output "name" {
@@ -110,19 +112,15 @@ output "ngw_subnets" {
 
 output "route_tables" {
   description = "Route tables created for subnet groups in this VPC"
-  value = {
-    airgapped = {
-      for group in var.subnet_groups : group.name => aws_route_table.route_table[group.name] if group.type == "airgapped"
+  value = merge({
+    for group in [for g in var.subnet_groups : g if g.type != "private"] : group.name => (
+      aws_route_table.route_table[group.name]
+    )
+    }, {
+    for group in [for g in var.subnet_groups : g if g.type == "private"] : group.name => {
+      for az in var.availability_zones : az => aws_route_table.route_table["${group.name}-${az}"]
     }
-    private = {
-      for group in var.subnet_groups : group.name => {
-        for az in var.availability_zones : az => aws_route_table.route_table["${group.name}-${az}"]
-      } if group.type == "private"
-    }
-    public = {
-      for group in var.subnet_groups : group.name => aws_route_table.route_table[group.name] if group.type == "public"
-    }
-  }
+  })
 }
 
 output "subnet_groups" {
@@ -132,7 +130,11 @@ output "subnet_groups" {
 
 output "subnets" {
   description = "The subnets created for subnet groups in this VPC"
-  value       = aws_subnet.subnet
+  value = {
+    for group in var.subnet_groups : group.name => {
+      for az in var.availability_zones : az => aws_subnet.subnet["${group.name}-${az}"]
+    }
+  }
 }
 
 output "tags" {
