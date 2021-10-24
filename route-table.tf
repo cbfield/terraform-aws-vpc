@@ -16,7 +16,7 @@ resource "aws_route_table" "route_table" {
   }
 
   dynamic "route" {
-    for_each = try(length(each.value.routes > 0), false) ? {
+    for_each = try(length(each.value.routes) > 0, false) ? {
       for route in each.value.routes : coalesce(route.cidr_block, route.ipv6_cidr_block, route.prefix_list_id) => route
     } : {}
 
