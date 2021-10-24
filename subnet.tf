@@ -14,17 +14,11 @@ resource "aws_subnet" "subnet" {
               group.first_netnum + index(sort(var.availability_zones), az)
             )
 
-            ipv6_cidr_block = ((
-              var.assign_generated_ipv6_cidr_block == null ||
-              group.ipv6_prefix == null ||
-              group.ipv6_newbits == null
-              ) ? null :
-              cidrsubnet(
-                aws_vpc.vpc.ipv6_cidr_block,
-                group.ipv6_newbits,
-                group.ipv6_first_netnum + index(sort(var.availability_zones), az)
-              )
-            )
+            ipv6_cidr_block = try(cidrsubnet(
+              aws_vpc.vpc.ipv6_cidr_block,
+              group.ipv6_newbits,
+              group.ipv6_first_netnum + index(sort(var.availability_zones), az)
+            ), null)
           })
         ]
       ]

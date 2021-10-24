@@ -106,20 +106,20 @@ variable "subnet_groups" {
     map_public_ip_on_launch         = optional(bool)
     nacl = optional(object({
       ingress = optional(list(object({
-        cidr_block  = string
-        from_port   = number
-        protocol    = string
-        rule_action = string
-        rule_number = number
-        to_port     = number
+        cidr_block = string
+        from_port  = number
+        protocol   = string
+        action     = string
+        rule_no    = number
+        to_port    = number
       })))
       egress = optional(list(object({
-        cidr_block  = string
-        from_port   = number
-        protocol    = string
-        rule_action = string
-        rule_number = number
-        to_port     = number
+        cidr_block = string
+        from_port  = number
+        protocol   = string
+        action     = string
+        rule_no    = number
+        to_port    = number
       })))
       self_ingress = optional(bool)
       tags         = optional(map(string))

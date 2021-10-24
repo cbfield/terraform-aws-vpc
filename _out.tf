@@ -73,14 +73,6 @@ output "internet_gateway" {
   value       = aws_internet_gateway.igw
 }
 
-output "nacl_rules" {
-  description = "NACL rules created for the NACLs in this VPC"
-  value = {
-    egress  = aws_network_acl_rule.egress
-    ingress = aws_network_acl_rule.ingress
-  }
-}
-
 output "nacls" {
   description = "NACLs created for subnet groups in this VPC"
   value       = aws_network_acl.nacl
@@ -104,16 +96,6 @@ output "ngw_eip" {
 output "ngw_nacl" {
   description = "The NACL that manages ingress and egress to the nat gateways for this VPC"
   value       = aws_network_acl.ngw_nacl
-}
-
-output "ngw_nacl_egress" {
-  description = "Egress rules for the nat gateway NACL"
-  value       = aws_network_acl_rule.ngw_egress
-}
-
-output "ngw_nacl_ingress" {
-  description = "Ingress rules for the nat gateway NACL"
-  value       = aws_network_acl_rule.ngw_ingress
 }
 
 output "ngw_route_table" {
