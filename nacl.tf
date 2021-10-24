@@ -18,10 +18,9 @@ resource "aws_network_acl" "nacl" {
   }
 
   dynamic "ingress" {
-    for_each = try(
-      { for ingress in each.value.ingress : coalesce(ingress.cidr_block, ingress.ipv6_cidr_block) => ingress },
-      {}
-    )
+    for_each = try(length(each.value.ingress > 0), false) ? {
+      for ingress in each.value.ingress : coalesce(ingress.cidr_block, ingress.ipv6_cidr_block) => ingress
+    } : {}
 
     content {
       from_port       = ingress.value.from_port
@@ -35,10 +34,9 @@ resource "aws_network_acl" "nacl" {
   }
 
   dynamic "egress" {
-    for_each = try(
-      { for egress in each.value.egress : coalesce(egress.cidr_block, egress.ipv6_cidr_block) => egress },
-      {}
-    )
+    for_each = try(length(each.value.egress > 0), false) ? {
+      for egress in each.value.egress : coalesce(egress.cidr_block, egress.ipv6_cidr_block) => egress
+    } : {}
 
     content {
       from_port  = egress.value.from_port
