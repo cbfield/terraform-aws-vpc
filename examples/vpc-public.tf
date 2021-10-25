@@ -26,31 +26,20 @@ module "public_vpc" {
       name         = "front-end"
       newbits      = 8
       first_netnum = 1
-      routes = [
-        {
-          cidr_block         = "10.20.0.0/16"
-          transit_gateway_id = "tgw-123123"
-        }
-      ]
     },
     {
       type         = "private"
       name         = "back-end"
       newbits      = 8
-      first_netnum = 3
-      nacl         = { self_ingress = true }
+      first_netnum = 4
     },
+  ]
+
+  vpc_endpoints = [
     {
-      type         = "private"
-      name         = "persistence"
-      newbits      = 8
-      first_netnum = 5
-    },
-    {
-      type         = "airgapped"
-      name         = "persistence-airgapped"
-      newbits      = 8
-      first_netnum = 7
-    },
+      service_name        = "com.amazonaws.s3-global.s3"
+      private_dns_enabled = true
+      vpc_endpoint_type   = "Interface"
+    }
   ]
 }

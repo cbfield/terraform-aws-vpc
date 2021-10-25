@@ -3,6 +3,6 @@ A Terraform module for an AWS Virtual Private Cloud (VPC), with included subnets
 
 # TODO
 - default AZs, per-subnet-group AZs ?
-- VPC endpoints argument
 - transit gateway attachments
 - peering attachments
+- privatelink or whatever attachments?

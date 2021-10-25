@@ -14,18 +14,18 @@ output "bastion_instances" {
 }
 
 output "bastion_ec2_key" {
-  description = "The EC2 keypair created to provide access to the bastions, if they were created"
-  value       = var.bastion != null ? aws_key_pair.bastion_ec2_key.0 : null
+  description = "The EC2 keypair created to provide access to the bastion hosts in this VPC"
+  value       = aws_key_pair.bastion_ec2_key
 }
 
 output "bastion_security_group" {
-  description = "The security group created for the bastion hosts, if they were created"
-  value       = var.bastion != null ? aws_security_group.bastion.0 : null
+  description = "The security group created for the bastion hosts in this VPC"
+  value       = aws_security_group.bastion
 }
 
 output "bastion_ssh_key" {
   description = "The tls key created to provide access to the bastions, if one was not provided"
-  value       = var.bastion != null ? var.bastion.public_key == null ? tls_private_key.bastion_ssh_key.0 : null : null
+  value       = try(var.bastion.public_key, null)
 }
 
 output "cidr_block" {
@@ -147,4 +147,29 @@ output "tags" {
 output "vpc" {
   description = "The VPC resource object"
   value       = aws_vpc.vpc
+}
+
+output "vpc_endpoint_nacl" {
+  description = "The NACL used by the VPC endpoint subnets"
+  value       = aws_network_acl.endpoint_nacl
+}
+
+output "vpc_endpoint_route_table" {
+  description = "The route table used by the VPC endpoint subnets"
+  value       = aws_route_table.endpoint_route_table
+}
+
+output "vpc_endpoint_security_group" {
+  description = "The security group used by the VPC endpoints in this VPC"
+  value       = aws_security_group.endpoint
+}
+
+output "vpc_endpoint_subnets" {
+  description = "The subnets that house VPC endpoints in this VPC"
+  value       = aws_subnet.endpoint_subnet
+}
+
+output "vpc_endpoints" {
+  description = "VPC endpoints created within this VPC"
+  value       = aws_vpc_endpoint.endpoint
 }

@@ -154,3 +154,17 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "vpc_endpoints" {
+  description = "VPC endpoints to create within this VPC"
+  type = list(object({
+    auto_accept         = optional(bool)
+    policy              = optional(string)
+    private_dns_enabled = optional(bool)
+    route_table_ids     = optional(list(string))
+    service_name        = string
+    tags                = optional(map(string))
+    vpc_endpoint_type   = optional(string)
+  }))
+  default = []
+}

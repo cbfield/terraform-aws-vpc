@@ -27,13 +27,13 @@ resource "aws_eip" "ngw_eip" {
 
 resource "aws_subnet" "ngw_subnet" {
   for_each = {
-    for az in toset(var.availability_zones) : az => {
+    for az in sort(var.availability_zones) : az => {
       az   = az
       name = "${var.name}-nat-gateway-${az}"
       cidr_block = cidrsubnet(
         var.cidr_block,
         28 - parseint(split("/", var.cidr_block)[1], 10),
-        index(var.availability_zones, az)
+        index(sort(var.availability_zones), az)
       )
     }
   }
@@ -64,6 +64,13 @@ resource "aws_route_table" "ngw_route_table" {
     "Name"                 = "${var.name}-nat-gateway"
     "Type"                 = "public"
   }
+}
+
+resource "aws_route_table_association" "ngw" {
+  for_each = toset(var.availability_zones)
+
+  route_table_id = aws_route_table.ngw_route_table.id
+  subnet_id      = aws_subnet.ngw_subnet[each.key].id
 }
 
 resource "aws_network_acl" "ngw_nacl" {

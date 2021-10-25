@@ -62,3 +62,25 @@ resource "aws_route_table" "route_table" {
     "Type"                 = each.value.type
   })
 }
+
+resource "aws_route_table_association" "association" {
+  for_each = {
+    for association in flatten([
+      for group in var.subnet_groups : [
+        for az in var.availability_zones : {
+          az         = az
+          group_name = group.name
+          type       = group.type
+        }
+      ]
+    ]) : "${association.group_name}-${association.az}" => association
+  }
+
+  route_table_id = each.value.type == "private" ? (
+    aws_route_table.route_table["${each.value.group_name}-${each.value.az}"].id
+    ) : (
+    aws_route_table.route_table[each.value.group_name].id
+  )
+
+  subnet_id = aws_subnet.subnet["${each.value.group_name}-${each.value.az}"].id
+}
