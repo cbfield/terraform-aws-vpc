@@ -2,7 +2,6 @@
 A Terraform module for an AWS Virtual Private Cloud (VPC), with included subnets, route tables, NACLs, and internet/ nat gateways
 
 # TODO
-- default AZs, per-subnet-group AZs ?
-- transit gateway attachments
 - peering attachments
+- default AZs, per-subnet-group AZs ?
 - privatelink or whatever attachments?

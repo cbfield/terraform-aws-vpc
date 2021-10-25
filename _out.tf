@@ -144,6 +144,31 @@ output "tags" {
   })
 }
 
+output "tgw_attachments" {
+  description = "Attachments to transit gateways from this VPC"
+  value       = aws_ec2_transit_gateway_vpc_attachment.attachment
+}
+
+output "tgw_nacl" {
+  description = "The NACL used by the transit gateway subnets"
+  value       = aws_network_acl.tgw_nacl
+}
+
+output "tgw_route_table" {
+  description = "The route table for the transit gateway subnets"
+  value       = aws_route_table.tgw_route_table
+}
+
+output "tgw_subnets" {
+  description = "The subnets created for transit gateway attachment network interfaces"
+  value       = aws_subnet.tgw_subnet
+}
+
+output "transit_gateway_attachments" {
+  description = "The value provided for var.transit_gateway_attachments"
+  value       = var.transit_gateway_attachments
+}
+
 output "vpc" {
   description = "The VPC resource object"
   value       = aws_vpc.vpc

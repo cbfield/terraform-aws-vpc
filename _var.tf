@@ -155,6 +155,20 @@ variable "tags" {
   default     = {}
 }
 
+variable "transit_gateway_attachments" {
+  description = "Attachments to transit gateways from this VPC"
+  type = list(object({
+    appliance_mode_support                          = optional(string)
+    dns_support                                     = optional(string)
+    ipv6_support                                    = optional(string)
+    tags                                            = optional(map(string))
+    transit_gateway_id                              = string
+    transit_gateway_default_route_table_association = optional(bool)
+    transit_gateway_default_route_table_propagation = optional(bool)
+  }))
+  default = []
+}
+
 variable "vpc_endpoints" {
   description = "VPC endpoints to create within this VPC"
   type = list(object({
