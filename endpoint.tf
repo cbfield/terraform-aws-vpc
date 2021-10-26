@@ -7,7 +7,7 @@ resource "aws_vpc_endpoint" "endpoint" {
   route_table_ids     = each.value.route_table_ids
   security_group_ids  = [aws_security_group.endpoint.id]
   service_name        = each.value.service_name
-  subnet_ids          = [for net in aws_subnet.endpoint_subnet : net.id]
+  subnet_ids          = each.value.vpc_endpoint_type == "Interface" ? [for net in aws_subnet.endpoint_subnet : net.id] : null
   vpc_endpoint_type   = each.value.vpc_endpoint_type
   vpc_id              = aws_vpc.vpc.id
 
