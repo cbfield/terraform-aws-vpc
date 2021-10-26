@@ -182,3 +182,25 @@ variable "vpc_endpoints" {
   }))
   default = []
 }
+
+variable "vpc_peering_connections" {
+  description = "Peering connections to make to VPCs elsewhere from this VPC"
+  type = list(object({
+    accepter = optional(object({
+      allow_classic_link_to_remote_vpc = optional(bool)
+      allow_remote_vpc_dns_resolution  = optional(bool)
+      allow_vpc_to_remote_classic_link = optional(bool)
+    }))
+    auto_accept   = optional(bool)
+    peer_owner_id = optional(string)
+    peer_region   = optional(string)
+    peer_vpc_id   = string
+    requester = optional(object({
+      allow_classic_link_to_remote_vpc = optional(bool)
+      allow_remote_vpc_dns_resolution  = optional(bool)
+      allow_vpc_to_remote_classic_link = optional(bool)
+    }))
+    tags = optional(map(string))
+  }))
+  default = []
+}

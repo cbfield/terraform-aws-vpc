@@ -32,4 +32,14 @@ module "public_vpc" {
   transit_gateway_attachments = [
     { transit_gateway_id = "tgw-123123" },
   ]
+
+  vpc_peering_connections = [
+    {
+      auto_accept   = true
+      peer_owner_id = "111222333444"
+      peer_vpc_id   = "vpc-123123"
+      peer_region   = "us-east-1"
+      tags          = { "something" = "whatever" }
+    }
+  ]
 }

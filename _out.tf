@@ -198,3 +198,8 @@ output "vpc_endpoints" {
   description = "VPC endpoints created within this VPC"
   value       = aws_vpc_endpoint.endpoint
 }
+
+output "vpc_peering_connections" {
+  description = "VPC peering connections originating from this VPC"
+  value       = aws_vpc_peering_connection.peer
+}
