@@ -1,6 +1,14 @@
 resource "aws_vpc_dhcp_options" "dhcp_options" {
-  domain_name          = var.dhcp.domain_name
-  domain_name_servers  = var.dhcp.domain_name_servers
+  domain_name = coalesce(
+    var.dhcp.domain_name,
+    data.aws_region.current.name == "us-east-1" ? "ec2.internal" : "${var.region}.compute.amazonaws.com"
+  )
+
+  domain_name_servers = coalesce(
+    var.dhcp.domain_name_servers,
+    "AmazonProvidedDNS"
+  )
+
   ntp_servers          = var.dhcp.ntp_servers
   netbios_name_servers = var.dhcp.netbios_name_servers
   netbios_node_type    = var.dhcp.netbios_node_type
