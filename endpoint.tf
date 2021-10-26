@@ -5,11 +5,15 @@ resource "aws_vpc_endpoint" "endpoint" {
   policy              = each.value.policy
   private_dns_enabled = each.value.private_dns_enabled
   route_table_ids     = each.value.route_table_ids
-  security_group_ids  = [aws_security_group.endpoint.id]
+  security_group_ids  = each.value.vpc_endpoint_type == "Interface" ? [aws_security_group.endpoint.id] : null
   service_name        = each.value.service_name
-  subnet_ids          = each.value.vpc_endpoint_type == "Interface" ? [for net in aws_subnet.endpoint_subnet : net.id] : null
-  vpc_endpoint_type   = each.value.vpc_endpoint_type
-  vpc_id              = aws_vpc.vpc.id
+
+  subnet_ids = each.value.vpc_endpoint_type == "Interface" || each.value.vpc_endpoint_type == "GatewayLoadBalancer" ? (
+    [for net in aws_subnet.endpoint_subnet : net.id]
+  ) : null
+
+  vpc_endpoint_type = each.value.vpc_endpoint_type
+  vpc_id            = aws_vpc.vpc.id
 
   tags = merge(each.value.tags, {
     "Managed By Terraform" = "true"
