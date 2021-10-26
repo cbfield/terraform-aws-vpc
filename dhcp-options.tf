@@ -1,7 +1,7 @@
 resource "aws_vpc_dhcp_options" "dhcp_options" {
   domain_name = coalesce(
     var.dhcp.domain_name,
-    data.aws_region.current.name == "us-east-1" ? "ec2.internal" : "${var.region}.compute.amazonaws.com"
+    data.aws_region.current.name == "us-east-1" ? "ec2.internal" : "${data.aws_region.current.name}.compute.amazonaws.com"
   )
 
   domain_name_servers = coalesce(
