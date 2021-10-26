@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 data "aws_ami" "al2" {
   count = (
     var.bastion != null ? (
