@@ -29,6 +29,16 @@ resource "aws_vpc_peering_connection" "peer" {
 
   tags = merge(each.value.tags, {
     "Managed By Terraform" = "true"
-    "Name"                 = "${aws_vpc.vpc.id} to ${each.value.peer_vpc_id}"
+  })
+}
+
+resource "aws_vpc_peering_connection_accepter" "peer_accepter" {
+  for_each = { for peer in var.vpc_peering_connection_accepters : peer.vpc_peering_connection_id => peer }
+
+  auto_accept               = each.value.auto_accept
+  vpc_peering_connection_id = each.value.vpc_peering_connection_id
+
+  tags = merge(each.value.tags, {
+    "Managed By Terraform" = "true"
   })
 }

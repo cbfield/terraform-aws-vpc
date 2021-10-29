@@ -85,27 +85,27 @@ output "name" {
   value       = var.name
 }
 
-output "ngw" {
+output "nat_gateway" {
   description = "The nat gateways used by this VPC"
   value       = aws_nat_gateway.ngw
 }
 
-output "ngw_eip" {
+output "nat_gateway_eip" {
   description = "The elastic IP addresses used by the nat gateways in this VPC"
   value       = aws_eip.ngw_eip
 }
 
-output "ngw_nacl" {
+output "nat_gateway_nacl" {
   description = "The NACL that manages ingress and egress to the nat gateways for this VPC"
   value       = aws_network_acl.ngw_nacl
 }
 
-output "ngw_route_table" {
+output "nat_gateway_route_table" {
   description = "The route table used by the nat gateways in this VPC"
   value       = aws_route_table.ngw_route_table
 }
 
-output "ngw_subnets" {
+output "nat_gateway_subnets" {
   description = "The subnets containing the nat gateways in this VPC"
   value       = aws_subnet.ngw_subnet
 }
@@ -144,29 +144,24 @@ output "tags" {
   })
 }
 
-output "tgw_attachments" {
+output "transit_gateway_attachments" {
   description = "Attachments to transit gateways from this VPC"
   value       = aws_ec2_transit_gateway_vpc_attachment.attachment
 }
 
-output "tgw_nacl" {
+output "transit_gateway_nacl" {
   description = "The NACL used by the transit gateway subnets"
   value       = aws_network_acl.tgw_nacl
 }
 
-output "tgw_route_table" {
+output "transit_gateway_route_table" {
   description = "The route table for the transit gateway subnets"
   value       = aws_route_table.tgw_route_table
 }
 
-output "tgw_subnets" {
-  description = "The subnets created for transit gateway attachment network interfaces"
+output "transit_gateway_subnets" {
+  description = "The subnets created for Transit Gateway attachment network interfaces"
   value       = aws_subnet.tgw_subnet
-}
-
-output "transit_gateway_attachments" {
-  description = "The value provided for var.transit_gateway_attachments"
-  value       = var.transit_gateway_attachments
 }
 
 output "vpc" {
@@ -197,6 +192,11 @@ output "vpc_endpoint_subnets" {
 output "vpc_endpoints" {
   description = "VPC endpoints created within this VPC"
   value       = aws_vpc_endpoint.endpoint
+}
+
+output "vpc_peering_connection_accepters" {
+  description = "VPC peering connections accepted by this VPC"
+  value       = aws_vpc_peering_connection_accepter.peer_accepter
 }
 
 output "vpc_peering_connections" {

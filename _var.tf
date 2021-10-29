@@ -20,7 +20,9 @@ variable "bastion" {
       security_groups = optional(list(string))
     }))
   })
-  default = null
+  default = {
+    subnets = []
+  }
 }
 
 variable "cidr_block" {
@@ -91,6 +93,18 @@ variable "internet_gateway" {
 variable "name" {
   description = "The name of the VPC, and the prefix for resources created within the VPC"
   type        = string
+}
+
+variable "nat_gateway_subnets" {
+  description = "Configuration options for the subnets created to house Nat Gateway attachment network interfaces"
+  type = object({
+    newbits      = optional(number)
+    first_netnum = optional(number)
+  })
+  default = {
+    newbits      = null
+    first_netnum = null
+  }
 }
 
 variable "subnet_groups" {
@@ -174,6 +188,30 @@ variable "transit_gateway_attachments" {
   default = []
 }
 
+variable "transit_gateway_subnets" {
+  description = "Configuration options for the subnets created to house Transit Gateway attachment network interfaces"
+  type = object({
+    newbits      = optional(number)
+    first_netnum = optional(number)
+  })
+  default = {
+    newbits      = null
+    first_netnum = null
+  }
+}
+
+variable "vpc_endpoint_subnets" {
+  description = "Configuration options for the subnets created to house VPC endpoints"
+  type = object({
+    newbits      = optional(number)
+    first_netnum = optional(number)
+  })
+  default = {
+    newbits      = null
+    first_netnum = null
+  }
+}
+
 variable "vpc_endpoints" {
   description = "VPC endpoints to create within this VPC"
   type = list(object({
@@ -184,6 +222,16 @@ variable "vpc_endpoints" {
     service_name        = string
     tags                = optional(map(string))
     vpc_endpoint_type   = optional(string)
+  }))
+  default = []
+}
+
+variable "vpc_peering_connection_accepters" {
+  description = "Accepters for vpc peering connections that originate elsewhere"
+  type = list(object({
+    auto_accept               = optional(bool)
+    tags                      = optional(map(string))
+    vpc_peering_connection_id = string
   }))
   default = []
 }

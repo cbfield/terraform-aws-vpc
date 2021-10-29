@@ -22,8 +22,8 @@ resource "aws_subnet" "tgw_subnet" {
       name = "${var.name}-transit-gateway-${az}"
       cidr_block = cidrsubnet(
         var.cidr_block,
-        28 - parseint(split("/", var.cidr_block)[1], 10),
-        length(var.availability_zones) + index(sort(var.availability_zones), az)
+        coalesce(var.transit_gateway_subnets.newbits, 28 - parseint(split("/", var.cidr_block)[1], 10)),
+        coalesce(var.transit_gateway_subnets.first_netnum, length(var.availability_zones)) + index(sort(var.availability_zones), az)
       )
     }
   }

@@ -32,8 +32,8 @@ resource "aws_subnet" "ngw_subnet" {
       name = "${var.name}-nat-gateway-${az}"
       cidr_block = cidrsubnet(
         var.cidr_block,
-        28 - parseint(split("/", var.cidr_block)[1], 10),
-        index(sort(var.availability_zones), az)
+        coalesce(var.nat_gateway_subnets.newbits, 28 - parseint(split("/", var.cidr_block)[1], 10)),
+        coalesce(var.nat_gateway_subnets.first_netnum, 0) + index(sort(var.availability_zones), az)
       )
     }
   }

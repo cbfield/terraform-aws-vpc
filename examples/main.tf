@@ -1,4 +1,4 @@
-module "public_vpc" {
+module "vpc_main" {
   source = "../"
 
   name       = "main"
@@ -20,6 +20,6 @@ module "public_vpc" {
       name         = "back-end"
       newbits      = 8
       first_netnum = 3
-    },
+    }
   ]
 }
