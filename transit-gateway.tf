@@ -43,23 +43,6 @@ resource "aws_subnet" "tgw_subnet" {
 resource "aws_route_table" "tgw_route_table" {
   vpc_id = aws_vpc.vpc.id
 
-  dynamic "route" {
-    for_each = {
-      for rule in flatten([
-        for group in var.subnet_groups : [
-          for route in group.routes : route if route.transit_gateway_id != null
-        ] if group.routes != null
-      ]) : "${coalesce(rule.cidr_block, rule.prefix_list_id, rule.ipv6_cidr_block)}-${rule.transit_gateway_id}" => rule
-    }
-
-    content {
-      cidr_block                 = route.value.cidr_block
-      destination_prefix_list_id = route.value.prefix_list_id
-      ipv6_cidr_block            = route.value.ipv6_cidr_block
-      transit_gateway_id         = route.value.transit_gateway_id
-    }
-  }
-
   tags = {
     "Availability Zones"   = join(",", var.availability_zones)
     "Managed By Terraform" = "true"
@@ -71,7 +54,7 @@ resource "aws_route_table" "tgw_route_table" {
 resource "aws_route_table_association" "tgw" {
   for_each = toset(var.availability_zones)
 
-  route_table_id = aws_route_table.endpoint_route_table.id
+  route_table_id = aws_route_table.tgw_route_table.id
   subnet_id      = aws_subnet.tgw_subnet[each.key].id
 }
 
