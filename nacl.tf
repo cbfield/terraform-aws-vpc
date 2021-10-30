@@ -8,7 +8,7 @@ resource "aws_network_acl" "nacl" {
     for_each = try(length(each.value.nacl.ingress) > 0, false) ? {
       for ingress in [
         for ing in each.value.nacl.ingress : ing if ing.subnet_group == null
-      ] : coalesce(ingress.cidr_block, ingress.ipv6_cidr_block) => ingress
+      ] : ingress.rule_no => ingress
     } : {}
 
     content {
@@ -28,7 +28,7 @@ resource "aws_network_acl" "nacl" {
         for ing in each.value.nacl.ingress : [
           for az in var.availability_zones : merge(ing, { az = az })
         ] if ing.subnet_group != null
-      ]) : "${ingress.subnet_group}-${ingress.az}" => ingress
+      ]) : ingress.rule_no + index(sort(var.availability_zones), ingress.az) => ingress
     } : {}
 
     content {
@@ -46,7 +46,7 @@ resource "aws_network_acl" "nacl" {
     for_each = try(length(each.value.nacl.egress) > 0, false) ? {
       for egress in [
         for eg in each.value.nacl.egress : eg if eg.subnet_group == null
-      ] : coalesce(egress.cidr_block, egress.ipv6_cidr_block) => egress
+      ] : egress.rule_no => egress
     } : {}
 
     content {
@@ -66,7 +66,7 @@ resource "aws_network_acl" "nacl" {
         for eg in each.value.nacl.egress : [
           for az in var.availability_zones : merge(eg, { az = az })
         ] if eg.subnet_group != null
-      ]) : "${egress.subnet_group}-${egress.az}" => egress
+      ]) : egress.rule_no + index(sort(var.availability_zones), egress.az) => egress
     } : {}
 
     content {
@@ -77,32 +77,6 @@ resource "aws_network_acl" "nacl" {
       cidr_block      = aws_subnet.subnet["${egress.value.subnet_group}-${egress.value.az}"].cidr_block
       ipv6_cidr_block = egress.value.ipv6_cidr_block
       rule_no         = egress.value.rule_no + index(sort(var.availability_zones), egress.value.az)
-    }
-  }
-
-  dynamic "ingress" {
-    for_each = try(each.value.nacl.self_ingress == true, false) ? toset(var.availability_zones) : toset([])
-
-    content {
-      from_port  = 0
-      to_port    = 0
-      protocol   = "-1"
-      action     = "allow"
-      cidr_block = aws_subnet.subnet["${each.value.name}-${ingress.key}"].cidr_block
-      rule_no    = 1 + index(sort(var.availability_zones), ingress.key)
-    }
-  }
-
-  dynamic "egress" {
-    for_each = try(each.value.nacl.self_egress == true, false) ? toset(var.availability_zones) : toset([])
-
-    content {
-      from_port  = 0
-      to_port    = 0
-      protocol   = "-1"
-      action     = "allow"
-      cidr_block = aws_subnet.subnet["${each.value.name}-${egress.key}"].cidr_block
-      rule_no    = 1 + index(sort(var.availability_zones), egress.key)
     }
   }
 

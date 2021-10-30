@@ -1,14 +1,16 @@
 resource "aws_instance" "bastion" {
   for_each = try(toset(var.bastion.subnets), toset([]))
 
-  ami                    = try(var.bastion.ami, data.aws_ami.al2.0.id)
+  ami                    = coalesce(try(var.bastion.ami, null), data.aws_ami.al2.0.id)
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.bastion_ec2_key.id
-  security_groups        = [aws_security_group.bastion.id]
-  vpc_security_group_ids = [each.key]
+  subnet_id              = each.key
+  vpc_security_group_ids = [aws_security_group.bastion.id]
 
   metadata_options {
-    http_tokens = "required"
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 1
+    http_tokens                 = "required"
   }
 
   tags = {
@@ -70,7 +72,7 @@ resource "aws_security_group_rule" "bastion_cidr_ingress" {
 }
 
 resource "aws_security_group_rule" "bastion_sg_ingress" {
-  for_each = try(toset(var.bastion.ingress.security_groups), toset([]))
+  for_each = toset(coalesce(try(var.bastion.ingress.security_groups, null), []))
 
   from_port                = 22
   protocol                 = "tcp"

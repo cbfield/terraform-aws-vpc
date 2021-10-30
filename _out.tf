@@ -25,7 +25,8 @@ output "bastion_security_group" {
 
 output "bastion_ssh_key" {
   description = "The tls key created to provide access to the bastions, if one was not provided"
-  value       = try(var.bastion.public_key, null)
+  value       = one(tls_private_key.bastion_ssh_key)
+  sensitive   = true
 }
 
 output "cidr_block" {

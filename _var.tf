@@ -139,9 +139,7 @@ variable "subnet_groups" {
         subnet_group    = optional(string)
         to_port         = number
       })))
-      self_egress  = optional(bool)
-      self_ingress = optional(bool)
-      tags         = optional(map(string))
+      tags = optional(map(string))
     }))
     name             = string
     newbits          = number

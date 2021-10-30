@@ -77,6 +77,15 @@ resource "aws_network_acl" "ngw_nacl" {
   subnet_ids = [for az in var.availability_zones : aws_subnet.ngw_subnet[az].id]
   vpc_id     = aws_vpc.vpc.id
 
+  ingress {
+    from_port  = 1024
+    to_port    = 65535
+    protocol   = "tcp"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    rule_no    = 1
+  }
+
   dynamic "ingress" {
     for_each = {
       for ingress in flatten([
@@ -97,7 +106,7 @@ resource "aws_network_acl" "ngw_nacl" {
       cidr_block = aws_subnet.subnet["${ingress.value.group_name}-${ingress.value.az}"].cidr_block
 
       rule_no = (
-        (1 + index(sort(var.availability_zones), ingress.value.az)) +
+        (2 + index(sort(var.availability_zones), ingress.value.az)) +
         (10 * (1 + index(sort(var.subnet_groups[*].name), ingress.value.group_name)))
       )
     }
