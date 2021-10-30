@@ -49,7 +49,7 @@ resource "aws_route_table" "tgw_route_table" {
         for group in var.subnet_groups : [
           for route in group.routes : route if route.transit_gateway_id != null
         ] if group.routes != null
-      ]) : rule.transit_gateway_id => rule
+      ]) : "${coalesce(rule.cidr_block, rule.prefix_list_id, rule.ipv6_cidr_block)}-${rule.transit_gateway_id}" => rule
     }
 
     content {
