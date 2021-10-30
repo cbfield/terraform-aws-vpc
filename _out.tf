@@ -116,6 +116,11 @@ output "region" {
   value       = data.aws_region.current
 }
 
+output "route53_resolver_rule_associations" {
+  description = "The value provided for var.route53_resolver_rule_associations"
+  value       = var.route53_resolver_rule_associations
+}
+
 output "route_tables" {
   description = "Route tables created for subnet groups in this VPC"
   value = merge({
