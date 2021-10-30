@@ -111,6 +111,11 @@ output "nat_gateway_subnets" {
   value       = aws_subnet.ngw_subnet
 }
 
+output "region" {
+  description = "The region containing the vpc"
+  value       = data.aws_region.current
+}
+
 output "route_tables" {
   description = "Route tables created for subnet groups in this VPC"
   value = merge({
