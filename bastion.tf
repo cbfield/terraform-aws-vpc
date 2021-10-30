@@ -15,7 +15,7 @@ resource "aws_instance" "bastion" {
 
   tags = {
     "Managed By Terraform" = "true"
-    "Name"                 = "${var.name}-bastion-${lookup(data.aws_subnet.bastion_subnet[each.key].tags, "Name", each.key)}"
+    "Name"                 = "bastion-${lookup(data.aws_subnet.bastion_subnet[each.key].tags, "Name", each.key)}"
   }
 
   lifecycle {
