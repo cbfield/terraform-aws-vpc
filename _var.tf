@@ -107,6 +107,12 @@ variable "nat_gateway_subnets" {
   }
 }
 
+variable "route53_resolver_rule_associations" {
+  description = "Route 53 Resolver rules to associate with this VPC"
+  type        = list(string)
+  default     = []
+}
+
 variable "subnet_groups" {
   description = "Configurations for groups of subnets. TODO better description"
   type = list(object({
