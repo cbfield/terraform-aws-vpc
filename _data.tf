@@ -15,3 +15,9 @@ data "aws_ami" "al2" {
     values = ["amzn2-ami-hvm-*-x86_64-ebs"]
   }
 }
+
+data "aws_subnet" "bastion_subnet" {
+  for_each = try(toset(var.bastion.subnets), toset([]))
+
+  id = each.key
+}
