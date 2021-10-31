@@ -49,6 +49,7 @@ resource "aws_security_group" "bastion" {
 
   tags = {
     "Managed By Terraform" = "true"
+    "Name"                 = "${var.name}-bastion"
   }
 }
 
