@@ -17,6 +17,7 @@ resource "aws_vpc_dhcp_options" "dhcp_options" {
 
   tags = merge(var.dhcp.tags, {
     "Managed By Terraform" = "true"
+    "Name"                 = var.name
   })
 }
 
