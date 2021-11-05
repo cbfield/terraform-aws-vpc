@@ -1,7 +1,7 @@
 resource "aws_instance" "bastion" {
   for_each = try(toset(var.bastion.subnets), toset([]))
 
-  ami                    = coalesce(try(var.bastion.ami, null), data.aws_ami.al2.0.id)
+  ami                    = coalesce(try(var.bastion.ami, null), try(data.aws_ami.al2.0.id, null))
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.bastion_ec2_key.id
   subnet_id              = each.key
