@@ -1,5 +1,5 @@
 module "vpc_main" {
-  source = "../"
+  source = "../../"
 
   name       = "main"
   cidr_block = "10.0.0.0/16"
