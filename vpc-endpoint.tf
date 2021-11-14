@@ -76,6 +76,15 @@ resource "aws_network_acl" "endpoint_nacl" {
     rule_no    = 1
   }
 
+  ingress {
+    from_port  = 1024
+    to_port    = 65535
+    protocol   = "tcp"
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    rule_no    = 2
+  }
+
   egress {
     from_port  = 0
     to_port    = 65535
