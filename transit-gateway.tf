@@ -53,7 +53,7 @@ resource "aws_route_table" "tgw_route_table" {
 
 resource "aws_route" "tgw_route" {
   for_each = {
-    for route in flatten([
+    for route in distinct(flatten([
       for group in var.subnet_groups : [
         for route in coalesce(group.routes, []) : merge(route, {
           destination = coalesce(
@@ -63,7 +63,7 @@ resource "aws_route" "tgw_route" {
           )
         }) if route.transit_gateway_id != null
       ]
-    ]) : route.destination => route
+    ])) : route.destination => route
   }
 
   destination_cidr_block      = each.value.cidr_block
