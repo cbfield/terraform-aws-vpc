@@ -28,7 +28,7 @@ resource "aws_subnet" "endpoint_subnet" {
       cidr_block = cidrsubnet(
         var.cidr_block,
         coalesce(var.vpc_endpoint_subnets.newbits, 27 - parseint(split("/", var.cidr_block)[1], 10)),
-        coalesce(var.vpc_endpoint_subnets.first_netnum, ceil(length(var.availability_zones))) + index(sort(var.availability_zones), az)
+        coalesce(var.vpc_endpoint_subnets.first_netnum, length(var.availability_zones)) + index(sort(var.availability_zones), az)
       )
     }
   }

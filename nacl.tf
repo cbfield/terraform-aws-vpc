@@ -43,7 +43,7 @@ resource "aws_network_acl_rule" "rule" {
           })]
         ]
       ) if group.nacl != null
-    ]) : "${rule.group_name}-${rule.rule_no}" => rule
+    ]) : "${rule.group_name}-${rule.egress ? "egress" : "ingress"}-${rule.rule_no}" => rule
   }
 
   cidr_block = each.value.subnet_group != null ? (
