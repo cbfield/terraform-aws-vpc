@@ -26,19 +26,11 @@ module "vpc_main" {
           },
           {
             cidr_block = "0.0.0.0/0"
-            from_port  = 80
-            to_port    = 80
-            protocol   = "tcp"
-            action     = "allow"
-            rule_no    = 2
-          },
-          {
-            cidr_block = "0.0.0.0/0"
             from_port  = 443
             to_port    = 443
             protocol   = "tcp"
             action     = "allow"
-            rule_no    = 3
+            rule_no    = 2
           },
         ]
         egress = [
@@ -61,13 +53,21 @@ module "vpc_main" {
       nacl = {
         ingress = [
           {
+            cidr_block = "0.0.0.0/0"
+            from_port  = 1024
+            to_port    = 65535
+            protocol   = "tcp"
+            action     = "allow"
+            rule_no    = 1
+          },
+          {
             subnet_group = "front-end"
             from_port    = 8080
             to_port      = 8080
             protocol     = "tcp"
             action       = "allow"
-            rule_no      = 1
-          }
+            rule_no      = 10
+          },
         ]
         egress = [
           {
@@ -77,12 +77,12 @@ module "vpc_main" {
             protocol   = "-1"
             action     = "allow"
             rule_no    = 1
-          }
+          },
         ]
       }
     },
     {
-      type         = "private" # or "airgapped" if internet access isn't required
+      type         = "airgapped" # == no internet access; use "private" for things that require an internet connection
       name         = "persistence"
       newbits      = 8
       first_netnum = 5

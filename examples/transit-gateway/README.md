@@ -1,3 +1,4 @@
+```hcl
 module "vpc_main" {
   source = "../../"
 
@@ -8,18 +9,9 @@ module "vpc_main" {
     "us-west-2b",
   ]
 
-  vpc_peering_connections = [
+  transit_gateway_attachments = [
     {
-      peer_vpc_id   = "vpc-123123"
-      peer_region   = "us-east-1"    # only required if VPC is in another region
-      peer_owner_id = "111222333444" # only required if VPC is owned by another AWS account
-      # ... optional attributes
-    }
-  ]
-
-  vpc_peering_connection_accepters = [
-    {
-      vpc_peering_connection_id = "pcx-123123"
+      transit_gateway_id = "tgw-123123"
       # ... optional attributes
     }
   ]
@@ -36,6 +28,13 @@ module "vpc_main" {
       name         = "back-end"
       newbits      = 8
       first_netnum = 3
+      routes = [
+        {
+          cidr_block         = "10.10.0.0/16"
+          transit_gateway_id = "tgw-123123"
+        }
+      ]
     }
   ]
 }
+```

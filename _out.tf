@@ -3,6 +3,11 @@ output "assign_generated_ipv6_cidr_block" {
   value       = var.assign_generated_ipv6_cidr_block
 }
 
+output "aws_caller_id" {
+  description = "The AWS caller identity used to build the module"
+  value       = data.aws_caller_identity.current
+}
+
 output "bastion" {
   description = "The value provided for var.bastion"
   value       = var.bastion
@@ -132,6 +137,11 @@ output "route_tables" {
       for az in var.availability_zones : az => aws_route_table.route_table["${group.name}-${az}"]
     }
   })
+}
+
+output "secondary_ipv4_cidr_blocks" {
+  description = "The value provided for var.secondary_ipv4_cidr_blocks"
+  value       = var.secondary_ipv4_cidr_blocks
 }
 
 output "subnet_groups" {

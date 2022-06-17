@@ -1,3 +1,4 @@
+```hcl
 module "vpc_main" {
   source = "../../"
 
@@ -6,22 +7,6 @@ module "vpc_main" {
   availability_zones = [
     "us-west-2a",
     "us-west-2b",
-  ]
-
-  vpc_peering_connections = [
-    {
-      peer_vpc_id   = "vpc-123123"
-      peer_region   = "us-east-1"    # only required if VPC is in another region
-      peer_owner_id = "111222333444" # only required if VPC is owned by another AWS account
-      # ... optional attributes
-    }
-  ]
-
-  vpc_peering_connection_accepters = [
-    {
-      vpc_peering_connection_id = "pcx-123123"
-      # ... optional attributes
-    }
   ]
 
   subnet_groups = [
@@ -39,3 +24,4 @@ module "vpc_main" {
     }
   ]
 }
+```
