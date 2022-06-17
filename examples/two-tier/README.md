@@ -1,3 +1,4 @@
+```hcl
 module "vpc_main" {
   source = "../../"
 
@@ -91,3 +92,4 @@ module "vpc_main" {
     }
   ]
 }
+```

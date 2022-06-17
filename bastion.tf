@@ -1,10 +1,19 @@
 resource "aws_instance" "bastion" {
-  for_each = try(toset(var.bastion.subnets), toset([]))
+  for_each = {
+    for net in flatten([
+      for subnet in try(var.bastion.subnets, []) : [
+        for az in coalesce(subnet.azs, var.availability_zones) : {
+          subnet_group = subnet.subnet_group
+          az           = az
+        }
+      ]
+    ]) : "${net.subnet_group}-${net.az}" => net
+  }
 
   ami                    = coalesce(try(var.bastion.ami, null), try(data.aws_ami.al2.0.id, null))
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.bastion_ec2_key.id
-  subnet_id              = each.key
+  subnet_id              = aws_subnet.subnet[each.key].id
   vpc_security_group_ids = [aws_security_group.bastion.id]
 
   metadata_options {
@@ -15,7 +24,7 @@ resource "aws_instance" "bastion" {
 
   tags = {
     "Managed By Terraform" = "true"
-    "Name"                 = "bastion-${lookup(data.aws_subnet.bastion_subnet[each.key].tags, "Name", each.key)}"
+    "Name"                 = "bastion-${each.value.subnet_group}-${each.value.az}"
   }
 
   lifecycle {

@@ -4,9 +4,14 @@ resource "aws_vpc_endpoint" "endpoint" {
   auto_accept         = each.value.auto_accept
   policy              = each.value.policy
   private_dns_enabled = each.value.private_dns_enabled
-  route_table_ids     = each.value.route_table_ids
-  security_group_ids  = each.value.vpc_endpoint_type == "Interface" ? [aws_security_group.endpoint.id] : null
-  service_name        = each.value.service_name
+  route_table_ids = each.value.vpc_endpoint_type == "Gateway" ? flatten([
+    for table in each.value.route_tables : try(
+      [aws_route_table.route_table[table.subnet_group].id],
+      [for az in try(each.value.azs, var.availability_zones) : aws_route_table.route_table["${table.subnet_group}-${az}"].id]
+    )
+  ]) : null
+  security_group_ids = each.value.vpc_endpoint_type == "Interface" ? [aws_security_group.endpoint.id] : null
+  service_name       = each.value.service_name
 
   subnet_ids = each.value.vpc_endpoint_type == "Interface" || each.value.vpc_endpoint_type == "GatewayLoadBalancer" ? (
     [for net in aws_subnet.endpoint_subnet : net.id]

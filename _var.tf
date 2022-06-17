@@ -14,7 +14,10 @@ variable "bastion" {
   type = object({
     ami        = optional(string)
     public_key = optional(string)
-    subnets    = list(string)
+    subnets = list(object({
+      subnet_group = string
+      azs          = optional(list(string))
+    }))
     ingress = optional(object({
       cidr_blocks     = optional(list(string))
       security_groups = optional(list(string))
@@ -111,6 +114,16 @@ variable "route53_resolver_rule_associations" {
   description = "Route 53 Resolver rules to associate with this VPC"
   type        = list(string)
   default     = []
+}
+
+variable "secondary_ipv4_cidr_blocks" {
+  description = "Additional IPv4 CIDR blocks to assign to the VPC"
+  type = list(object({
+    cidr_block          = optional(string)
+    ipv4_ipam_pool_id   = optional(string)
+    ipv4_netmask_length = optional(string)
+  }))
+  default = []
 }
 
 variable "subnet_groups" {
@@ -222,10 +235,13 @@ variable "vpc_endpoints" {
     auto_accept         = optional(bool)
     policy              = optional(string)
     private_dns_enabled = optional(bool)
-    route_table_ids     = optional(list(string))
-    service_name        = string
-    tags                = optional(map(string))
-    vpc_endpoint_type   = optional(string)
+    route_tables = optional(list(object({
+      subnet_group = string
+      azs          = optional(list(string))
+    })))
+    service_name      = string
+    tags              = optional(map(string))
+    vpc_endpoint_type = optional(string)
   }))
   default = []
 }

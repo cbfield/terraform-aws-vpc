@@ -12,16 +12,13 @@ module "vpc_main" {
     {
       service_name      = "com.amazonaws.us-east-1.s3"
       vpc_endpoint_type = "Gateway"
-      # VPC has to be created before this endpoint, so the `route_tables` output is populated
-      route_table_ids = [for table in module.vpc_main.route_tables["back-end"] : table.id]
-      # ... optional attributes
+      route_tables      = [{ subnet_group = "back-end" }]
     },
     {
       service_name        = "com.amazonaws.us-east-1.execute-api"
       vpc_endpoint_type   = "Interface"
       private_dns_enabled = true
-      # ... optional attributes
-    },
+    }
   ]
 
   subnet_groups = [
@@ -36,6 +33,6 @@ module "vpc_main" {
       name         = "back-end"
       newbits      = 8
       first_netnum = 3
-    },
+    }
   ]
 }

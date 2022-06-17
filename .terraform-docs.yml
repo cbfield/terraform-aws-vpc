@@ -1,0 +1,8 @@
+formatter: ""
+output:
+  file: README.md
+settings:
+  hide-empty: true
+sort:
+  enabled: true
+  by: name

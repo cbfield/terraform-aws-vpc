@@ -1,3 +1,4 @@
+```hcl
 module "vpc_main" {
   source = "../../"
 
@@ -31,7 +32,7 @@ module "vpc_main" {
             protocol   = "tcp"
             action     = "allow"
             rule_no    = 2
-          }
+          },
         ]
         egress = [
           {
@@ -68,13 +69,33 @@ module "vpc_main" {
             action       = "allow"
             rule_no      = 10
           },
+        ]
+        egress = [
+          {
+            cidr_block = "0.0.0.0/0"
+            from_port  = 0
+            to_port    = 0
+            protocol   = "-1"
+            action     = "allow"
+            rule_no    = 1
+          },
+        ]
+      }
+    },
+    {
+      type         = "airgapped" # == no internet access; use "private" for things that require an internet connection
+      name         = "persistence"
+      newbits      = 8
+      first_netnum = 5
+      nacl = {
+        ingress = [
           {
             subnet_group = "back-end"
             from_port    = 5432
             to_port      = 5432
             protocol     = "tcp"
             action       = "allow"
-            rule_no      = 20
+            rule_no      = 1
           }
         ]
         egress = [
@@ -91,3 +112,5 @@ module "vpc_main" {
     }
   ]
 }
+
+```

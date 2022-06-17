@@ -13,3 +13,14 @@ resource "aws_vpc" "vpc" {
     "Name"                 = var.name
   })
 }
+
+resource "aws_vpc_ipv4_cidr_block_association" "secondary_cidr" {
+  for_each = {
+    for cidr in var.secondary_ipv4_cidr_blocks : cidr.cidr_block => cidr
+  }
+
+  cidr_block          = each.value.cidr_block
+  ipv4_ipam_pool_id   = each.value.ipv4_ipam_pool_id
+  ipv4_netmask_length = each.value.ipv4_netmask_length
+  vpc_id              = aws_vpc.vpc.id
+}

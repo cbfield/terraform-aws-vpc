@@ -1,3 +1,4 @@
+```hcl
 module "vpc_main" {
   source = "../../"
 
@@ -8,19 +9,16 @@ module "vpc_main" {
     "us-west-2b",
   ]
 
-  vpc_peering_connections = [
+  vpc_endpoints = [
     {
-      peer_vpc_id   = "vpc-123123"
-      peer_region   = "us-east-1"    # only required if VPC is in another region
-      peer_owner_id = "111222333444" # only required if VPC is owned by another AWS account
-      # ... optional attributes
-    }
-  ]
-
-  vpc_peering_connection_accepters = [
+      service_name      = "com.amazonaws.us-east-1.s3"
+      vpc_endpoint_type = "Gateway"
+      route_tables      = [{ subnet_group = "back-end" }]
+    },
     {
-      vpc_peering_connection_id = "pcx-123123"
-      # ... optional attributes
+      service_name        = "com.amazonaws.us-east-1.execute-api"
+      vpc_endpoint_type   = "Interface"
+      private_dns_enabled = true
     }
   ]
 
@@ -39,3 +37,4 @@ module "vpc_main" {
     }
   ]
 }
+```

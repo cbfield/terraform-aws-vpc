@@ -1,11 +1,8 @@
 # terraform-aws-vpc
 A Terraform module for an AWS Virtual Private Cloud (VPC), with included subnets, route tables, NACLs, and internet/ nat gateways
 
-# Terraform Docs
+<!-- BEGIN_TF_DOCS -->
 
-## Requirements
-
-No requirements.
 
 ## Providers
 
@@ -13,10 +10,6 @@ No requirements.
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
-
-## Modules
-
-No modules.
 
 ## Resources
 
@@ -32,6 +25,15 @@ No modules.
 | [aws_network_acl.nacl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl) | resource |
 | [aws_network_acl.ngw_nacl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl) | resource |
 | [aws_network_acl.tgw_nacl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl) | resource |
+| [aws_network_acl_rule.ngw_egress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
+| [aws_network_acl_rule.ngw_ephemeral_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
+| [aws_network_acl_rule.ngw_subnet_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
+| [aws_network_acl_rule.rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/network_acl_rule) | resource |
+| [aws_route.igw_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.ngw_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route.tgw_route](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route) | resource |
+| [aws_route53_resolver_rule_association.rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_resolver_rule_association) | resource |
 | [aws_route_table.endpoint_route_table](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.ngw_route_table](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table.route_table](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
@@ -56,10 +58,12 @@ No modules.
 | [aws_vpc_dhcp_options.dhcp_options](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_dhcp_options) | resource |
 | [aws_vpc_dhcp_options_association.dhcp_options_association](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_dhcp_options_association) | resource |
 | [aws_vpc_endpoint.endpoint](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_vpc_ipv4_cidr_block_association.secondary_cidr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_ipv4_cidr_block_association) | resource |
 | [aws_vpc_peering_connection.peer](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection) | resource |
 | [aws_vpc_peering_connection_accepter.peer_accepter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_peering_connection_accepter) | resource |
 | [tls_private_key.bastion_ssh_key](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
 | [aws_ami.al2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
@@ -68,7 +72,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_assign_generated_ipv6_cidr_block"></a> [assign\_generated\_ipv6\_cidr\_block](#input\_assign\_generated\_ipv6\_cidr\_block) | Whether to request a /56 IPv6 CIDR block for the VPC | `bool` | `false` | no |
 | <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | Availability zones to distribute resources within | `list(string)` | n/a | yes |
-| <a name="input_bastion"></a> [bastion](#input\_bastion) | Configurations for bastion hosts in this VPC | <pre>object({<br>    ami        = optional(string)<br>    public_key = optional(string)<br>    subnets    = list(string)<br>    ingress = optional(object({<br>      cidr_blocks     = optional(list(string))<br>      security_groups = optional(list(string))<br>    }))<br>  })</pre> | <pre>{<br>  "subnets": []<br>}</pre> | no |
+| <a name="input_bastion"></a> [bastion](#input\_bastion) | Configurations for bastion hosts in this VPC | <pre>object({<br>    ami        = optional(string)<br>    public_key = optional(string)<br>    subnets = list(object({<br>      subnet_group = string<br>      azs          = optional(list(string))<br>    }))<br>    ingress = optional(object({<br>      cidr_blocks     = optional(list(string))<br>      security_groups = optional(list(string))<br>    }))<br>  })</pre> | <pre>{<br>  "subnets": []<br>}</pre> | no |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | A CIDR block to assign to the VPC | `string` | n/a | yes |
 | <a name="input_dhcp"></a> [dhcp](#input\_dhcp) | Configurations for DHCP options for this VPC | <pre>object({<br>    domain_name          = optional(string)<br>    domain_name_servers  = optional(list(string))<br>    ntp_servers          = optional(list(string))<br>    netbios_name_servers = optional(list(string))<br>    netbios_node_type    = optional(number)<br>    tags                 = optional(map(string))<br>  })</pre> | <pre>{<br>  "domain_name": null,<br>  "domain_name_servers": null,<br>  "netbios_name_servers": null,<br>  "netbios_node_type": null,<br>  "ntp_servers": null,<br>  "tags": null<br>}</pre> | no |
 | <a name="input_enable_classiclink"></a> [enable\_classiclink](#input\_enable\_classiclink) | Whether or not to enable ClassicLink for the VPC | `bool` | `false` | no |
@@ -79,12 +83,14 @@ No modules.
 | <a name="input_internet_gateway"></a> [internet\_gateway](#input\_internet\_gateway) | Configurations for the internet gateway used by this VPC | <pre>object({<br>    tags = optional(map(string))<br>  })</pre> | <pre>{<br>  "tags": null<br>}</pre> | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the VPC, and the prefix for resources created within the VPC | `string` | n/a | yes |
 | <a name="input_nat_gateway_subnets"></a> [nat\_gateway\_subnets](#input\_nat\_gateway\_subnets) | Configuration options for the subnets created to house Nat Gateway attachment network interfaces | <pre>object({<br>    newbits      = optional(number)<br>    first_netnum = optional(number)<br>  })</pre> | <pre>{<br>  "first_netnum": null,<br>  "newbits": null<br>}</pre> | no |
+| <a name="input_route53_resolver_rule_associations"></a> [route53\_resolver\_rule\_associations](#input\_route53\_resolver\_rule\_associations) | Route 53 Resolver rules to associate with this VPC | `list(string)` | `[]` | no |
+| <a name="input_secondary_ipv4_cidr_blocks"></a> [secondary\_ipv4\_cidr\_blocks](#input\_secondary\_ipv4\_cidr\_blocks) | Additional IPv4 CIDR blocks to assign to the VPC | <pre>list(object({<br>    cidr_block          = optional(string)<br>    ipv4_ipam_pool_id   = optional(string)<br>    ipv4_netmask_length = optional(string)<br>  }))</pre> | `[]` | no |
 | <a name="input_subnet_groups"></a> [subnet\_groups](#input\_subnet\_groups) | Configurations for groups of subnets. TODO better description | <pre>list(object({<br>    assign_ipv6_address_on_creation = optional(bool)<br>    customer_owned_ipv4_pool        = optional(string)<br>    first_netnum                    = number<br>    ipv6_first_netnum               = optional(number)<br>    ipv6_newbits                    = optional(number)<br>    ipv6_prefix                     = optional(string)<br>    map_customer_owned_ip_on_launch = optional(bool)<br>    map_public_ip_on_launch         = optional(bool)<br>    nacl = optional(object({<br>      ingress = optional(list(object({<br>        cidr_block      = optional(string)<br>        from_port       = number<br>        ipv6_cidr_block = optional(string)<br>        protocol        = string<br>        action          = string<br>        rule_no         = number<br>        subnet_group    = optional(string)<br>        to_port         = number<br>      })))<br>      egress = optional(list(object({<br>        cidr_block      = optional(string)<br>        from_port       = number<br>        ipv6_cidr_block = optional(string)<br>        protocol        = string<br>        action          = string<br>        rule_no         = number<br>        subnet_group    = optional(string)<br>        to_port         = number<br>      })))<br>      tags = optional(map(string))<br>    }))<br>    name             = string<br>    newbits          = number<br>    outpost_arn      = optional(string)<br>    route_table_tags = optional(map(string))<br>    routes = optional(list(object({<br>      carrier_gateway_id        = optional(string)<br>      cidr_block                = optional(string)<br>      ipv6_cidr_block           = optional(string)<br>      prefix_list_id            = optional(string)<br>      egress_only_gateway_id    = optional(string)<br>      gateway_id                = optional(string)<br>      instance_id               = optional(string)<br>      local_gateway_id          = optional(string)<br>      nat_gateway_id            = optional(string)<br>      network_interface_id      = optional(string)<br>      transit_gateway_id        = optional(string)<br>      vpc_endpoint_id           = optional(string)<br>      vpc_peering_connection_id = optional(string)<br>    })))<br>    tags = optional(map(string))<br>    type = string<br>  }))</pre> | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign to the VPC | `map(string)` | `{}` | no |
 | <a name="input_transit_gateway_attachments"></a> [transit\_gateway\_attachments](#input\_transit\_gateway\_attachments) | Attachments to transit gateways from this VPC | <pre>list(object({<br>    appliance_mode_support                          = optional(string)<br>    dns_support                                     = optional(string)<br>    ipv6_support                                    = optional(string)<br>    tags                                            = optional(map(string))<br>    transit_gateway_id                              = string<br>    transit_gateway_default_route_table_association = optional(bool)<br>    transit_gateway_default_route_table_propagation = optional(bool)<br>  }))</pre> | `[]` | no |
 | <a name="input_transit_gateway_subnets"></a> [transit\_gateway\_subnets](#input\_transit\_gateway\_subnets) | Configuration options for the subnets created to house Transit Gateway attachment network interfaces | <pre>object({<br>    newbits      = optional(number)<br>    first_netnum = optional(number)<br>  })</pre> | <pre>{<br>  "first_netnum": null,<br>  "newbits": null<br>}</pre> | no |
 | <a name="input_vpc_endpoint_subnets"></a> [vpc\_endpoint\_subnets](#input\_vpc\_endpoint\_subnets) | Configuration options for the subnets created to house VPC endpoints | <pre>object({<br>    newbits      = optional(number)<br>    first_netnum = optional(number)<br>  })</pre> | <pre>{<br>  "first_netnum": null,<br>  "newbits": null<br>}</pre> | no |
-| <a name="input_vpc_endpoints"></a> [vpc\_endpoints](#input\_vpc\_endpoints) | VPC endpoints to create within this VPC | <pre>list(object({<br>    auto_accept         = optional(bool)<br>    policy              = optional(string)<br>    private_dns_enabled = optional(bool)<br>    route_table_ids     = optional(list(string))<br>    service_name        = string<br>    tags                = optional(map(string))<br>    vpc_endpoint_type   = optional(string)<br>  }))</pre> | `[]` | no |
+| <a name="input_vpc_endpoints"></a> [vpc\_endpoints](#input\_vpc\_endpoints) | VPC endpoints to create within this VPC | <pre>list(object({<br>    auto_accept         = optional(bool)<br>    policy              = optional(string)<br>    private_dns_enabled = optional(bool)<br>    route_tables = optional(list(object({<br>      subnet_group = string<br>      azs          = optional(list(string))<br>    })))<br>    service_name      = string<br>    tags              = optional(map(string))<br>    vpc_endpoint_type = optional(string)<br>  }))</pre> | `[]` | no |
 | <a name="input_vpc_peering_connection_accepters"></a> [vpc\_peering\_connection\_accepters](#input\_vpc\_peering\_connection\_accepters) | Accepters for vpc peering connections that originate elsewhere | <pre>list(object({<br>    auto_accept               = optional(bool)<br>    tags                      = optional(map(string))<br>    vpc_peering_connection_id = string<br>  }))</pre> | `[]` | no |
 | <a name="input_vpc_peering_connections"></a> [vpc\_peering\_connections](#input\_vpc\_peering\_connections) | Peering connections to make to VPCs elsewhere from this VPC | <pre>list(object({<br>    accepter = optional(object({<br>      allow_classic_link_to_remote_vpc = optional(bool)<br>      allow_remote_vpc_dns_resolution  = optional(bool)<br>      allow_vpc_to_remote_classic_link = optional(bool)<br>    }))<br>    auto_accept   = optional(bool)<br>    peer_owner_id = optional(string)<br>    peer_region   = optional(string)<br>    peer_vpc_id   = string<br>    requester = optional(object({<br>      allow_classic_link_to_remote_vpc = optional(bool)<br>      allow_remote_vpc_dns_resolution  = optional(bool)<br>      allow_vpc_to_remote_classic_link = optional(bool)<br>    }))<br>    tags = optional(map(string))<br>  }))</pre> | `[]` | no |
 
@@ -93,6 +99,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_assign_generated_ipv6_cidr_block"></a> [assign\_generated\_ipv6\_cidr\_block](#output\_assign\_generated\_ipv6\_cidr\_block) | The value provided for var.assign\_generated\_ipv6\_cidr\_block |
+| <a name="output_aws_caller_id"></a> [aws\_caller\_id](#output\_aws\_caller\_id) | The AWS caller identity used to build the module |
 | <a name="output_bastion"></a> [bastion](#output\_bastion) | The value provided for var.bastion |
 | <a name="output_bastion_ec2_key"></a> [bastion\_ec2\_key](#output\_bastion\_ec2\_key) | The EC2 keypair created to provide access to the bastion hosts in this VPC |
 | <a name="output_bastion_instances"></a> [bastion\_instances](#output\_bastion\_instances) | The ec2 instaces created as bastion hosts in this VPC |
@@ -114,7 +121,10 @@ No modules.
 | <a name="output_nat_gateway_nacl"></a> [nat\_gateway\_nacl](#output\_nat\_gateway\_nacl) | The NACL that manages ingress and egress to the nat gateways for this VPC |
 | <a name="output_nat_gateway_route_table"></a> [nat\_gateway\_route\_table](#output\_nat\_gateway\_route\_table) | The route table used by the nat gateways in this VPC |
 | <a name="output_nat_gateway_subnets"></a> [nat\_gateway\_subnets](#output\_nat\_gateway\_subnets) | The subnets containing the nat gateways in this VPC |
+| <a name="output_region"></a> [region](#output\_region) | The region containing the vpc |
+| <a name="output_route53_resolver_rule_associations"></a> [route53\_resolver\_rule\_associations](#output\_route53\_resolver\_rule\_associations) | The value provided for var.route53\_resolver\_rule\_associations |
 | <a name="output_route_tables"></a> [route\_tables](#output\_route\_tables) | Route tables created for subnet groups in this VPC |
+| <a name="output_secondary_ipv4_cidr_blocks"></a> [secondary\_ipv4\_cidr\_blocks](#output\_secondary\_ipv4\_cidr\_blocks) | The value provided for var.secondary\_ipv4\_cidr\_blocks |
 | <a name="output_subnet_groups"></a> [subnet\_groups](#output\_subnet\_groups) | The provided value for var.subnet\_groups |
 | <a name="output_subnets"></a> [subnets](#output\_subnets) | The subnets created for subnet groups in this VPC |
 | <a name="output_tags"></a> [tags](#output\_tags) | Tags assigned to the VPC |
@@ -130,3 +140,4 @@ No modules.
 | <a name="output_vpc_endpoints"></a> [vpc\_endpoints](#output\_vpc\_endpoints) | VPC endpoints created within this VPC |
 | <a name="output_vpc_peering_connection_accepters"></a> [vpc\_peering\_connection\_accepters](#output\_vpc\_peering\_connection\_accepters) | VPC peering connections accepted by this VPC |
 | <a name="output_vpc_peering_connections"></a> [vpc\_peering\_connections](#output\_vpc\_peering\_connections) | VPC peering connections originating from this VPC |
+<!-- END_TF_DOCS -->
