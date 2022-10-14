@@ -19,8 +19,8 @@ variable "bastion" {
       azs          = optional(list(string))
     }))
     ingress = optional(object({
-      cidr_blocks     = optional(list(string))
-      security_groups = optional(list(string))
+      cidr_blocks     = optional(list(string), [])
+      security_groups = optional(list(string), [])
     }))
   })
   default = {

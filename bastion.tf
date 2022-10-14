@@ -1,7 +1,7 @@
 resource "aws_instance" "bastion" {
   for_each = {
     for net in flatten([
-      for subnet in try(var.bastion.subnets, []) : [
+      for subnet in var.bastion.subnets : [
         for az in coalesce(subnet.azs, var.availability_zones) : {
           subnet_group = subnet.subnet_group
           az           = az
@@ -10,7 +10,7 @@ resource "aws_instance" "bastion" {
     ]) : "${net.subnet_group}-${net.az}" => net
   }
 
-  ami                    = coalesce(try(var.bastion.ami, null), try(data.aws_ami.al2.0.id, null))
+  ami                    = coalesce(try(var.bastion.ami, null), try(data.aws_ami.al2[0].id, null))
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.bastion_ec2_key.id
   subnet_id              = aws_subnet.subnet[each.key].id
@@ -44,7 +44,7 @@ resource "aws_key_pair" "bastion_ec2_key" {
 
   public_key = coalesce(
     try(var.bastion.public_key, null),
-    tls_private_key.bastion_ssh_key[0].public_key_openssh
+    try(tls_private_key.bastion_ssh_key[0].public_key_openssh, null)
   )
   tags = {
     "Managed By Terraform" = "true"
@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "bastion_cidr_ingress" {
 }
 
 resource "aws_security_group_rule" "bastion_sg_ingress" {
-  for_each = toset(coalesce(try(var.bastion.ingress.security_groups, null), []))
+  for_each = toset(try(var.bastion.ingress.security_groups, []))
 
   from_port                = 22
   protocol                 = "tcp"

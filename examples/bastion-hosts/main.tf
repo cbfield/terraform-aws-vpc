@@ -23,8 +23,8 @@ module "vpc_main" {
       cidr_blocks     = ["10.0.0.0/8"]
       security_groups = ["sg-123123"]
     }
-    # ami = "ami-123123" (optional)
-    # public_key = "ssh-rsa ..." (optional)
+    # ami = "ami-123123" # (optional)
+    # public_key = "ssh-rsa ..." # (optional)
   }
 
   subnet_groups = [
