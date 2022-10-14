@@ -44,7 +44,7 @@ resource "aws_key_pair" "bastion_ec2_key" {
 
   public_key = coalesce(
     try(var.bastion.public_key, null),
-    tls_private_key.bastion_ssh_key.0.public_key_openssh
+    tls_private_key.bastion_ssh_key[0].public_key_openssh
   )
   tags = {
     "Managed By Terraform" = "true"
