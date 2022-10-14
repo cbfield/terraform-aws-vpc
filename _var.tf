@@ -37,20 +37,13 @@ variable "dhcp" {
   description = "Configurations for DHCP options for this VPC"
   type = object({
     domain_name          = optional(string)
-    domain_name_servers  = optional(list(string))
+    domain_name_servers  = optional(list(string), ["AmazonProvidedDNS"])
     ntp_servers          = optional(list(string))
     netbios_name_servers = optional(list(string))
     netbios_node_type    = optional(number)
     tags                 = optional(map(string))
   })
-  default = {
-    domain_name          = null
-    domain_name_servers  = null
-    ntp_servers          = null
-    netbios_name_servers = null
-    netbios_node_type    = null
-    tags                 = null
-  }
+  default = {}
 }
 
 variable "enable_classiclink" {
