@@ -81,9 +81,7 @@ variable "internet_gateway" {
   type = object({
     tags = optional(map(string))
   })
-  default = {
-    tags = null
-  }
+  default = {}
 }
 
 variable "name" {
@@ -198,10 +196,7 @@ variable "transit_gateway_subnets" {
     newbits      = optional(number)
     first_netnum = optional(number)
   })
-  default = {
-    newbits      = null
-    first_netnum = null
-  }
+  default = {}
 }
 
 variable "vpc_endpoint_subnets" {
@@ -210,10 +205,7 @@ variable "vpc_endpoint_subnets" {
     newbits      = optional(number)
     first_netnum = optional(number)
   })
-  default = {
-    newbits      = null
-    first_netnum = null
-  }
+  default = {}
 }
 
 variable "vpc_endpoints" {
