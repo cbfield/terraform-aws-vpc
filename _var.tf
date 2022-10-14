@@ -137,29 +137,18 @@ variable "subnet_groups" {
     ipv6_prefix                     = optional(string)
     map_customer_owned_ip_on_launch = optional(bool)
     map_public_ip_on_launch         = optional(bool)
-    nacl = optional(object({
-      ingress = optional(list(object({
-        cidr_block      = optional(string)
-        from_port       = number
-        ipv6_cidr_block = optional(string)
-        protocol        = string
-        action          = string
-        rule_no         = number
-        subnet_group    = optional(string)
-        to_port         = number
-      })))
-      egress = optional(list(object({
-        cidr_block      = optional(string)
-        from_port       = number
-        ipv6_cidr_block = optional(string)
-        protocol        = string
-        action          = string
-        rule_no         = number
-        subnet_group    = optional(string)
-        to_port         = number
-      })))
-      tags = optional(map(string))
-    }))
+    nacl = optional(list(object({
+      cidr_block      = optional(string)
+      from_port       = number
+      egress          = optional(bool, false)
+      ipv6_cidr_block = optional(string)
+      protocol        = string
+      action          = string
+      rule_no         = number
+      subnet_group    = optional(string)
+      to_port         = number
+      tags            = optional(map(string))
+    })))
     name             = string
     newbits          = number
     outpost_arn      = optional(string)

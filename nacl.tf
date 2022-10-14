@@ -15,40 +15,39 @@ resource "aws_network_acl" "nacl" {
 resource "aws_network_acl_rule" "rule" {
   for_each = {
     for rule in flatten([
-      for group in var.subnet_groups : concat(
-        [
-          for ingress in coalesce(group.nacl.ingress, []) : ingress.subnet_group != null ? [
-            for az in var.availability_zones : merge(ingress, {
-              az         = az
-              egress     = false
-              group_name = group.name
-              rule_no    = ingress.rule_no + index(sort(var.availability_zones), az)
-            })
-            ] : [merge(ingress, {
-              egress     = false
-              group_name = group.name
-          })]
-        ],
-        [
-          for egress in coalesce(group.nacl.egress, []) : egress.subnet_group != null ? [
-            for az in var.availability_zones : merge(egress, {
-              az         = az
-              egress     = true
-              group_name = group.name
-              rule_no    = egress.rule_no + index(sort(var.availability_zones), az)
-            })
-            ] : [merge(egress, {
-              egress     = true
-              group_name = group.name
-          })]
-        ]
-      ) if group.nacl != null
+      for group in var.subnet_groups : [
+        for rule in coalesce(group.nacl, []) : merge(rule, { group_name = group.name }) if rule.subnet_group == null
+      ] if group.nacl != null
     ]) : "${rule.group_name}-${rule.egress ? "egress" : "ingress"}-${rule.rule_no}" => rule
   }
 
-  cidr_block = each.value.subnet_group != null ? (
-    aws_subnet.subnet["${each.value.subnet_group}-${each.value.az}"].cidr_block
-  ) : each.value.cidr_block
+  cidr_block      = each.value.cidr_block
+  egress          = each.value.egress
+  from_port       = each.value.from_port
+  ipv6_cidr_block = each.value.ipv6_cidr_block
+  network_acl_id  = aws_network_acl.nacl[each.value.group_name].id
+  protocol        = each.value.protocol
+  rule_action     = each.value.action
+  rule_number     = each.value.rule_no
+  to_port         = each.value.to_port
+}
+
+resource "aws_network_acl_rule" "rule_by_group" {
+  for_each = {
+    for rule in flatten([
+      for group in var.subnet_groups : [
+        for rule in coalesce(group.nacl, []) : [
+          for az in var.availability_zones : merge(rule, {
+            az         = az
+            group_name = group.name
+            rule_no    = rule.rule_no + index(sort(var.availability_zones), az)
+          })
+        ] if rule.subnet_group != null
+      ] if group.nacl != null
+    ]) : "${rule.group_name}-${rule.egress ? "egress" : "ingress"}-${rule.rule_no}" => rule
+  }
+
+  cidr_block      = aws_subnet.subnet["${each.value.subnet_group}-${each.value.az}"].cidr_block
   egress          = each.value.egress
   from_port       = each.value.from_port
   ipv6_cidr_block = each.value.ipv6_cidr_block
