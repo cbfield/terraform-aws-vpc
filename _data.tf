@@ -3,11 +3,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 data "aws_ami" "al2" {
-  count = (
-    var.bastion != null ? (
-      var.bastion.ami == null ? 1 : 0
-    ) : 0
-  )
+  count = try(var.bastion.ami == null, true) ? 1 : 0
 
   most_recent = true
   owners      = ["amazon"]

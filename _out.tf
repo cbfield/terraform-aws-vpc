@@ -80,7 +80,12 @@ output "internet_gateway" {
 }
 
 output "nacls" {
-  description = "NACLs created for subnet groups in this VPC"
+  description = "Network ACLs created for subnet groups in this VPC"
+  value       = aws_network_acl.nacl
+}
+
+output "nacls_by_group" {
+  description = "Network ACLs created for subnet groups in this VPC, nested by group (ex. module.my_vpc.nacls_by_group[\"my-group\"].arn)"
   value = {
     for group in var.subnet_groups : group.name => aws_network_acl.nacl[group.name]
   }
@@ -127,7 +132,15 @@ output "route53_resolver_rule_associations" {
 }
 
 output "route_tables" {
-  description = "Route tables created for subnet groups in this VPC"
+  description = "Route tables created for this VPC"
+  value       = aws_route_table.route_table
+}
+
+output "route_tables_by_group" {
+  description = <<-EOF
+    Route tables created for this VPC. Nested by group and AZ (ex. module.my_vpc.route_tables_by_group[\"my-group\"][\"us-west-1a\"].arn) for private subnet groups,
+    and nested by group (ex. module.my_vpc.route_tables_by_group[\"my-group\"].arn) for public and airgapped subnet groups
+  EOF
   value = merge({
     for group in [for g in var.subnet_groups : g if g.type != "private"] : group.name => (
       aws_route_table.route_table[group.name]
@@ -150,7 +163,12 @@ output "subnet_groups" {
 }
 
 output "subnets" {
-  description = "The subnets created for subnet groups in this VPC"
+  description = "Subnets created in this VPC"
+  value       = aws_subnet.subnet
+}
+
+output "subnets_by_group" {
+  description = "Subnets created in this VPC, nested by group and AZ (ex. module.my_vpc.subnets_by_group[\"my-group\"][\"us-west-1a\"].arn)"
   value = {
     for group in var.subnet_groups : group.name => {
       for az in var.availability_zones : az => aws_subnet.subnet["${group.name}-${az}"]

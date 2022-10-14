@@ -19,8 +19,8 @@ variable "bastion" {
       azs          = optional(list(string))
     }))
     ingress = optional(object({
-      cidr_blocks     = optional(list(string))
-      security_groups = optional(list(string))
+      cidr_blocks     = optional(list(string), [])
+      security_groups = optional(list(string), [])
     }))
   })
   default = {
@@ -37,20 +37,13 @@ variable "dhcp" {
   description = "Configurations for DHCP options for this VPC"
   type = object({
     domain_name          = optional(string)
-    domain_name_servers  = optional(list(string))
+    domain_name_servers  = optional(list(string), ["AmazonProvidedDNS"])
     ntp_servers          = optional(list(string))
     netbios_name_servers = optional(list(string))
     netbios_node_type    = optional(number)
     tags                 = optional(map(string))
   })
-  default = {
-    domain_name          = null
-    domain_name_servers  = null
-    ntp_servers          = null
-    netbios_name_servers = null
-    netbios_node_type    = null
-    tags                 = null
-  }
+  default = {}
 }
 
 variable "enable_classiclink" {
@@ -88,9 +81,7 @@ variable "internet_gateway" {
   type = object({
     tags = optional(map(string))
   })
-  default = {
-    tags = null
-  }
+  default = {}
 }
 
 variable "name" {
@@ -121,13 +112,18 @@ variable "secondary_ipv4_cidr_blocks" {
   type = list(object({
     cidr_block          = optional(string)
     ipv4_ipam_pool_id   = optional(string)
-    ipv4_netmask_length = optional(string)
+    ipv4_netmask_length = optional(number)
   }))
   default = []
 }
 
 variable "subnet_groups" {
-  description = "Configurations for groups of subnets. TODO better description"
+  description = <<-EOF
+    Configurations for groups of subnets. For each group, one subnet will be created in each availability zone.
+    Each subnet in a group will share a common network ACL. If the subnet group type is 'private', routes to a 
+    nat gateway will be created. If the subnet group type is 'public', routes to an internet gateway will be created.
+    If the subnet group type is 'airgapped', neither will be created.
+  EOF
   type = list(object({
     assign_ipv6_address_on_creation = optional(bool)
     customer_owned_ipv4_pool        = optional(string)
@@ -137,29 +133,18 @@ variable "subnet_groups" {
     ipv6_prefix                     = optional(string)
     map_customer_owned_ip_on_launch = optional(bool)
     map_public_ip_on_launch         = optional(bool)
-    nacl = optional(object({
-      ingress = optional(list(object({
-        cidr_block      = optional(string)
-        from_port       = number
-        ipv6_cidr_block = optional(string)
-        protocol        = string
-        action          = string
-        rule_no         = number
-        subnet_group    = optional(string)
-        to_port         = number
-      })))
-      egress = optional(list(object({
-        cidr_block      = optional(string)
-        from_port       = number
-        ipv6_cidr_block = optional(string)
-        protocol        = string
-        action          = string
-        rule_no         = number
-        subnet_group    = optional(string)
-        to_port         = number
-      })))
-      tags = optional(map(string))
-    }))
+    nacl = optional(list(object({
+      cidr_block      = optional(string)
+      from_port       = number
+      egress          = optional(bool, false)
+      ipv6_cidr_block = optional(string)
+      protocol        = string
+      action          = string
+      rule_no         = number
+      subnet_group    = optional(string)
+      to_port         = number
+      tags            = optional(map(string))
+    })), [])
     name             = string
     newbits          = number
     outpost_arn      = optional(string)
@@ -211,10 +196,7 @@ variable "transit_gateway_subnets" {
     newbits      = optional(number)
     first_netnum = optional(number)
   })
-  default = {
-    newbits      = null
-    first_netnum = null
-  }
+  default = {}
 }
 
 variable "vpc_endpoint_subnets" {
@@ -223,10 +205,7 @@ variable "vpc_endpoint_subnets" {
     newbits      = optional(number)
     first_netnum = optional(number)
   })
-  default = {
-    newbits      = null
-    first_netnum = null
-  }
+  default = {}
 }
 
 variable "vpc_endpoints" {
