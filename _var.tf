@@ -120,7 +120,12 @@ variable "secondary_ipv4_cidr_blocks" {
 }
 
 variable "subnet_groups" {
-  description = "Configurations for groups of subnets. TODO better description"
+  description = <<-EOF
+    Configurations for groups of subnets. For each group, one subnet will be created in each availability zone.
+    Each subnet in a group will share a common network ACL. If the subnet group type is 'private', routes to a 
+    nat gateway will be created. If the subnet group type is 'public', routes to an internet gateway will be created.
+    If the subnet group type is 'airgapped', neither will be created.
+  EOF
   type = list(object({
     assign_ipv6_address_on_creation = optional(bool)
     customer_owned_ipv4_pool        = optional(string)
