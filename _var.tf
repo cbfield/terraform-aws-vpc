@@ -141,7 +141,7 @@ variable "subnet_groups" {
       subnet_group    = optional(string)
       to_port         = number
       tags            = optional(map(string))
-    })))
+    })), [])
     name             = string
     newbits          = number
     outpost_arn      = optional(string)

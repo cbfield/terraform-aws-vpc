@@ -17,7 +17,7 @@ resource "aws_network_acl_rule" "rule" {
     for rule in flatten([
       for group in var.subnet_groups : [
         for rule in coalesce(group.nacl, []) : merge(rule, { group_name = group.name }) if rule.subnet_group == null
-      ] if group.nacl != null
+      ]
     ]) : "${rule.group_name}-${rule.egress ? "egress" : "ingress"}-${rule.rule_no}" => rule
   }
 
@@ -43,7 +43,7 @@ resource "aws_network_acl_rule" "rule_by_group" {
             rule_no    = rule.rule_no + index(sort(var.availability_zones), az)
           })
         ] if rule.subnet_group != null
-      ] if group.nacl != null
+      ]
     ]) : "${rule.group_name}-${rule.egress ? "egress" : "ingress"}-${rule.rule_no}" => rule
   }
 
