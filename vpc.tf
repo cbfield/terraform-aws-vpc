@@ -18,7 +18,7 @@ resource "aws_vpc_ipv4_cidr_block_association" "secondary_cidr" {
   for_each = {
     for cidr in var.secondary_ipv4_cidr_blocks : coalesce(
       cidr.cidr_block,
-      try("${cidr.ipv4_ipam_pool_id}-${cidr.ipv4_netmask_length}", null)
+      "${coalesce(cidr.ipv4_ipam_pool_id, "null")}-${coalesce(cidr.ipv4_netmask_length, "null")}"
     ) => cidr
   }
 

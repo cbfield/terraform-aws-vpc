@@ -114,7 +114,7 @@ variable "secondary_ipv4_cidr_blocks" {
   type = list(object({
     cidr_block          = optional(string)
     ipv4_ipam_pool_id   = optional(string)
-    ipv4_netmask_length = optional(string)
+    ipv4_netmask_length = optional(number)
   }))
   default = []
 }
