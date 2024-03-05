@@ -85,7 +85,6 @@ resource "aws_route" "route" {
   destination_prefix_list_id  = each.value.prefix_list_id
   egress_only_gateway_id      = each.value.egress_only_gateway_id
   gateway_id                  = each.value.gateway_id
-  instance_id                 = each.value.instance_id
   nat_gateway_id              = each.value.nat_gateway_id
   local_gateway_id            = each.value.local_gateway_id
   network_interface_id        = each.value.network_interface_id

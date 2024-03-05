@@ -39,16 +39,6 @@ output "cidr_block" {
   value       = var.cidr_block
 }
 
-output "enable_classiclink" {
-  description = "The provided value for var.enable_classiclink"
-  value       = var.enable_classiclink
-}
-
-output "enable_classiclink_dns_support" {
-  description = "The provided value for var.enable_classiclink_dns_support"
-  value       = var.enable_classiclink_dns_support
-}
-
 output "enable_dns_hostnames" {
   description = "The provided value for var.enable_dns_hostnames"
   value       = var.enable_dns_hostnames
