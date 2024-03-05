@@ -11,9 +11,7 @@ resource "aws_vpc_peering_connection" "peer" {
     for_each = each.value.accepter != null ? toset([1]) : toset([])
 
     content {
-      allow_classic_link_to_remote_vpc = each.value.accepter.allow_classic_link_to_remote_vpc
       allow_remote_vpc_dns_resolution  = each.value.accepter.allow_remote_vpc_dns_resolution
-      allow_vpc_to_remote_classic_link = each.value.accepter.allow_vpc_to_remote_classic_link
     }
   }
 
@@ -21,9 +19,7 @@ resource "aws_vpc_peering_connection" "peer" {
     for_each = each.value.requester != null ? toset([1]) : toset([])
 
     content {
-      allow_classic_link_to_remote_vpc = each.value.requester.allow_classic_link_to_remote_vpc
       allow_remote_vpc_dns_resolution  = each.value.requester.allow_remote_vpc_dns_resolution
-      allow_vpc_to_remote_classic_link = each.value.requester.allow_vpc_to_remote_classic_link
     }
   }
 

@@ -46,18 +46,6 @@ variable "dhcp" {
   default = {}
 }
 
-variable "enable_classiclink" {
-  description = "Whether or not to enable ClassicLink for the VPC"
-  type        = bool
-  default     = false
-}
-
-variable "enable_classiclink_dns_support" {
-  description = "Whether or not to enable ClassicLink DNS support for the VPC"
-  type        = bool
-  default     = false
-}
-
 variable "enable_dns_hostnames" {
   description = "Whether or not to enable internal DNS hostnames within the VPC"
   type        = bool
@@ -156,7 +144,6 @@ variable "subnet_groups" {
       prefix_list_id            = optional(string)
       egress_only_gateway_id    = optional(string)
       gateway_id                = optional(string)
-      instance_id               = optional(string)
       local_gateway_id          = optional(string)
       nat_gateway_id            = optional(string)
       network_interface_id      = optional(string)
@@ -239,18 +226,14 @@ variable "vpc_peering_connections" {
   description = "Peering connections to make to VPCs elsewhere from this VPC"
   type = list(object({
     accepter = optional(object({
-      allow_classic_link_to_remote_vpc = optional(bool)
       allow_remote_vpc_dns_resolution  = optional(bool)
-      allow_vpc_to_remote_classic_link = optional(bool)
     }))
     auto_accept   = optional(bool)
     peer_owner_id = optional(string)
     peer_region   = optional(string)
     peer_vpc_id   = string
     requester = optional(object({
-      allow_classic_link_to_remote_vpc = optional(bool)
       allow_remote_vpc_dns_resolution  = optional(bool)
-      allow_vpc_to_remote_classic_link = optional(bool)
     }))
     tags = optional(map(string))
   }))
