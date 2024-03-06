@@ -14,7 +14,7 @@ resource "aws_nat_gateway" "ngw" {
 resource "aws_eip" "ngw_eip" {
   for_each = toset(var.availability_zones)
 
-  vpc = true
+  domain = "vpc"
 
   tags = {
     "Availability Zone"    = each.key
